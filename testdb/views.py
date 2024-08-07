@@ -1,4 +1,4 @@
-
+from django.contrib.auth.forms import AuthenticationForm
 # Create your views here.
 from django.shortcuts import render, redirect
 from django.views import View
@@ -20,4 +20,8 @@ class HomeView(View):
 
 class LogInView(View):
     def get(self, request, *args, **kwargs):
+        template_name = 'login.html'
+        def get(self, request):
+            form = AuthenticationForm()
+            return render(request, self.template_name, {'form': form})
 
