@@ -1,0 +1,1 @@
+HangryFix is a web app that presents users with restaurants in their desired locations. Users can rate the meals they had in those restaurants. Owners can add their own restaurant to the website for users to view.
