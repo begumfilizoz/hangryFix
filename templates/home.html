@@ -29,10 +29,10 @@
         {% endfor %}
     </ul>
 
-    <h2>Comments</h2>
+{% comment %}    <h2>Comments</h2>
     <ul>
         {% for comment in comments %}
             <li>{{ comment.user.username }} - {{ comment.restaurant.name }} - {{ comment.rating }}: {{ comment.comment }}</li>
         {% endfor %}
-    </ul>
+    </ul>{% endcomment %}
 {% endblock %}
