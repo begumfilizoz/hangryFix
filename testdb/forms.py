@@ -4,9 +4,10 @@ from testdb.models import User, Restaurant
 
 
 class UserCreationForm(UserCreationForm):
+    isOwner = forms.BooleanField(required=False, label='Are you the owner of (a) restaurant(s)?')
     class Meta:
         model = User
-        fields = ['username', 'email', 'name', 'location', 'password1', 'password2']
+        fields = ['username', 'email', 'name', 'isOwner', 'location', 'password1', 'password2']
 
 
 class AddRestaurantForm(forms.ModelForm):

@@ -1,5 +1,5 @@
 # Create your views here.
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from .models import Restaurant, Food, User, Comment
 from .forms import UserCreationForm, AddRestaurantForm
@@ -71,3 +71,15 @@ class AddRestaurantView(View):
             form.save()
             return redirect('home')
         return render(request, 'addrestaurant.html', {'form': form})
+
+class RestaurantDetailView(View):
+    def get(self, request, id):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        return render(request, 'restaurantdetail.html', {'restaurant': restaurant})
+
+class ProfileView(View):
+    def get(self, request, id):
+        user = get_object_or_404(User, id=id)
+        if not request.user.is_authenticated:
+            return redirect('login')
+        return render(request, 'profile.html', {'user': user})

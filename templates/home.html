@@ -7,8 +7,11 @@
     <ul>
         {% for restaurant in restaurants %}
             <li>
-                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }}
-                <ul>
+                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.point }}
+                <a href="{% url 'restaurantdetail' restaurant.id %}">
+                <button>Check Reviews</button>
+                </a>
+                {% comment %}<ul>
                     {% for food in restaurant.food_set.all %}
                         <li>{{ food.name }} - {{ food.price }}</li>
                     {% endfor %}
@@ -17,17 +20,18 @@
                     {% for comment in restaurant.comment_set.all %}
                         <li>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars: {{ comment.comment }}</li>
                     {% endfor %}
-                </ul>
+                </ul>{% endcomment %}
+                
             </li>
         {% endfor %}
     </ul>
 
-    <h2>Users</h2>
+    {% comment %}<h2>Users</h2>
     <ul>
         {% for user in users %}
             <li>{{ user.username }} - {{ user.location }}</li>
         {% endfor %}
-    </ul>
+    </ul>{% endcomment %}
 
 {% comment %}    <h2>Comments</h2>
     <ul>

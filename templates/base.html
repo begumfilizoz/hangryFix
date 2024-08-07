@@ -28,6 +28,11 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'addrestaurant' %}">Add Your Restaurant</a>
           </li>
+          {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' user.id %}">Profile</a>
+          </li>
+          {% endif %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'contact' %}">Contact</a>
           </li>
