@@ -9,6 +9,16 @@
         {% csrf_token %}
         <button type="submit">Log Out</button>
     </form>
+    <p>Your Reviews:</p>
+    {% for comment in comments %}
+        <li>For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars and this review: {{ comment.comment }}
+            <form method="post" action="{% url 'deletecommentfromprofile' comment.id %}">
+                {% csrf_token %}
+                <button type="submit">Delete this comment</button>
+            </form>
+        </li>
+    {%  endfor %}
+    <br>
     {% if user.isOwner %}
         <a href="{% url 'addrestaurant' %}">
         <button>Add Your Restaurant</button>
@@ -26,7 +36,10 @@
                 <a href="{% url 'removemeals' restaurant.id %}">
                 <button>Remove Meals</button>
                 </a>
-                <button>Remove Restaurant</button>
+                <form method="post" action="{% url 'removerestaurant' restaurant.id user.id %}">
+                {% csrf_token %}
+                <button type="submit">Remove Restaurant</button>
+                </form>
                 {% comment %}<ul>
                     {% for food in restaurant.food_set.all %}
                         <li>{{ food.name }} - {{ food.price }}</li>

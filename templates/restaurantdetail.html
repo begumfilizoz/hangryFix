@@ -4,18 +4,35 @@
 
 {% block content %}
     <h1>{{ restaurant.name }}</h1>
-    <p>Point: {{ restaurant.point }}</p>
+    <p>Rating: {{ restaurant.point }}</p>
     <p>City: {{ restaurant.city }}</p>
     <p>Cuisine: {{ restaurant.cuisine }}</p>
-    <a href="{% url 'home' %}">Back to Home</a>
+    <a href="{% url 'home' %}"><button>Back to Home</button></a>
     <p>Menu:</p>
     {% for food in restaurant.food_set.all %}
-        <li>{{ food.name }} - {{ food.price }}</li>
+        <li>{{ food.name }} - {{ food.price }} : {{ food.description }}</li>
     {% endfor %}
     <br />
     <p>Comments:</p>
+    {% if user.is_authenticated %}
+        <p>Add your review: </p>
+            <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Publish</button>
+            </form>
+    {% else %}
+        <p>Login to add a review</p>
+    {% endif %}
     {% for comment in restaurant.comment_set.all %}
-        <li>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars: {{ comment.comment }}</li>
+        <li>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars: {{ comment.comment }}
+        {% if comment.user == user %}
+            <form method="post" action="{% url 'deletecommentfromrest' restaurant.id comment.id %}">
+                {% csrf_token %}
+                <button type="submit">Delete this comment</button>
+            </form>
+        {% endif %}
+        </li>
     {% endfor %}
     
 {% endblock %}
