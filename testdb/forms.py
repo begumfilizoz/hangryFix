@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from testdb.models import User, Restaurant
+from testdb.models import User, Restaurant, Food
 
 
 class UserCreationForm(UserCreationForm):
@@ -13,4 +13,9 @@ class UserCreationForm(UserCreationForm):
 class AddRestaurantForm(forms.ModelForm):
     class Meta:
         model = Restaurant
-        fields = '__all__'
+        fields = ['name', 'point', 'city', 'cuisine']
+
+class AddMealForm(forms.ModelForm):
+    class Meta:
+        model = Food
+        fields = ['name', 'price', 'description']

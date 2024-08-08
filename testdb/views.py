@@ -2,8 +2,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from .models import Restaurant, Food, User, Comment
-from .forms import UserCreationForm, AddRestaurantForm
-from django.contrib.auth import authenticate, login as auth_login
+from .forms import UserCreationForm, AddRestaurantForm, AddMealForm
+from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 
 
@@ -68,7 +68,9 @@ class AddRestaurantView(View):
     def post(self, request):
         form = AddRestaurantForm(request.POST)
         if form.is_valid():
-            form.save()
+            restaurant = form.save(commit=False)
+            restaurant.owner = request.user
+            restaurant.save()
             return redirect('home')
         return render(request, 'addrestaurant.html', {'form': form})
 
@@ -80,6 +82,39 @@ class RestaurantDetailView(View):
 class ProfileView(View):
     def get(self, request, id):
         user = get_object_or_404(User, id=id)
+        restaurants = Restaurant.objects.filter(owner=user)
         if not request.user.is_authenticated:
             return redirect('login')
-        return render(request, 'profile.html', {'user': user})
+        return render(request, 'profile.html', {'user': user, 'restaurants': restaurants})
+
+class LogoutView(View):
+    def post(self, request):
+        logout(request)
+        return redirect('home')
+
+class AddMealView(View):
+    def get(self, request, id):
+        form = AddMealForm()
+        restaurant = get_object_or_404(Restaurant, id=id)
+        return render(request, 'addmeal.html', {'form': form, 'restaurant': restaurant})
+    def post(self, request,id):
+        form = AddMealForm(request.POST)
+        if form.is_valid():
+            restaurant = get_object_or_404(Restaurant, id=id)
+            meal = form.save(commit=False)
+            meal.restaurant = restaurant
+            meal.save()
+            user_id = request.user.id
+            return redirect('profile', id=user_id)
+        return render(request, 'addmeal.html', {'form': form, 'id': id})
+
+class RemoveMealsView(View):
+    def get(self, request, id):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        return render(request, 'removemeals.html', {'restaurant': restaurant})
+
+class RemoveMealView(View):
+    def post(self, request, foodId, resId):
+        food = get_object_or_404(Food, id=foodId)
+        food.delete()
+        return redirect('removemeals', id=resId)

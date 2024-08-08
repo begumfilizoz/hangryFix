@@ -25,9 +25,9 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
           </li>
-          <li class="nav-item">
+          {% comment %}<li class="nav-item">
             <a class="nav-link" href="{% url 'addrestaurant' %}">Add Your Restaurant</a>
-          </li>
+          </li>{% endcomment %}
           {% if user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link" href="{% url 'profile' user.id %}">Profile</a>

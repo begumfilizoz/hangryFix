@@ -5,4 +5,40 @@
     <h2>{{ user.name }}</h2>
     <p>E-mail: {{ user.email }}</p>
     <p>Location: {{ user.location }}</p>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Log Out</button>
+    </form>
+    {% if user.isOwner %}
+        <a href="{% url 'addrestaurant' %}">
+        <button>Add Your Restaurant</button>
+        </a>
+        <h2>Your Restaurants</h2>
+        {% for restaurant in restaurants %}
+            <li>
+                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.point }}
+                <a href="{% url 'restaurantdetail' restaurant.id %}">
+                <button>Check Reviews</button>
+                </a>
+                <a href="{% url 'addmeal' restaurant.id %}">
+                <button>Add a Meal</button>
+                </a>
+                <a href="{% url 'removemeals' restaurant.id %}">
+                <button>Remove Meals</button>
+                </a>
+                <button>Remove Restaurant</button>
+                {% comment %}<ul>
+                    {% for food in restaurant.food_set.all %}
+                        <li>{{ food.name }} - {{ food.price }}</li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for comment in restaurant.comment_set.all %}
+                        <li>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars: {{ comment.comment }}</li>
+                    {% endfor %}
+                </ul>{% endcomment %}
+                
+            </li>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

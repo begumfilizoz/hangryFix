@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Remove Meals From the Menu of Your Restaurant {{ restaurant.name }}{% endblock %}
+
+{% block content %}
+    <h2>Remove Meals From the Menu of Your Restaurant {{ restaurant.name }}</h2>
+    <p>Menu:</p>
+    {% for food in restaurant.food_set.all %}
+        <li>{{ food.name }} - {{ food.price }}
+            <form method="post" action="{% url 'removemeal' food.id restaurant.id %}">
+                {% csrf_token %}
+                <button type="submit">Remove This Meal</button>
+            </form>
+        </li>
+    {% endfor %}
+{% endblock %}
