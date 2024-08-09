@@ -7,7 +7,7 @@
     <ul>
         {% for restaurant in restaurants %}
             <li>
-                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.point }}
+                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.find_rating|floatformat:1 }}
                 <a href="{% url 'restaurantdetail' restaurant.id %}">
                 <button>Check Reviews</button>
                 </a>

@@ -5,6 +5,7 @@ from .models import Restaurant, Food, User, Comment
 from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
+from django.db.models import Avg
 
 
 class HomeView(View):
@@ -81,8 +82,9 @@ class AddRestaurantView(View):
 class RestaurantDetailView(View):
     def get(self, request, id):
         restaurant = get_object_or_404(Restaurant, id=id)
+        rating = restaurant.find_rating()
         form = AddCommentForm()
-        return render(request, 'restaurantdetail.html', {'restaurant': restaurant, 'form': form})
+        return render(request, 'restaurantdetail.html', {'restaurant': restaurant, 'form': form, 'rating': rating})
 
     def post(self, request, id):
         restaurant = get_object_or_404(Restaurant, id=id)
@@ -162,3 +164,11 @@ class RemoveRestaurantView(View):
         restaurant = get_object_or_404(Restaurant, id=resId)
         restaurant.delete()
         return redirect('profile', id=userId)
+
+
+class DeleteUserView(View):
+    def post(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        logout(request)
+        user.delete()
+        return redirect('login')

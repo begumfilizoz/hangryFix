@@ -9,12 +9,19 @@
         {% csrf_token %}
         <button type="submit">Log Out</button>
     </form>
+    <form method="post" action="{% url 'deleteuser' %}">
+        {% csrf_token %}
+        <button type="submit">Delete Your Account</button>
+    </form>
     <p>Your Reviews:</p>
     {% for comment in comments %}
-        <li>For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars and this review: {{ comment.comment }}
+        <li>For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
+            {% if comment.comment %} 
+                and this review: {{ comment.comment }}
+            {% endif %}
             <form method="post" action="{% url 'deletecommentfromprofile' comment.id %}">
                 {% csrf_token %}
-                <button type="submit">Delete this comment</button>
+                <button type="submit">Delete this review</button>
             </form>
         </li>
     {%  endfor %}
@@ -26,7 +33,7 @@
         <h2>Your Restaurants</h2>
         {% for restaurant in restaurants %}
             <li>
-                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.point }}
+                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.find_rating|floatformat:1 }}
                 <a href="{% url 'restaurantdetail' restaurant.id %}">
                 <button>Check Reviews</button>
                 </a>

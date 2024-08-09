@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1>{{ restaurant.name }}</h1>
-    <p>Rating: {{ restaurant.point }}</p>
+    <p>Rating: {{ rating|floatformat:1 }}</p>
     <p>City: {{ restaurant.city }}</p>
     <p>Cuisine: {{ restaurant.cuisine }}</p>
     <a href="{% url 'home' %}"><button>Back to Home</button></a>
@@ -25,11 +25,14 @@
         <p>Login to add a review</p>
     {% endif %}
     {% for comment in restaurant.comment_set.all %}
-        <li>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars: {{ comment.comment }}
+        <li>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars
+            {% if comment.comment %} 
+            : {{ comment.comment }} 
+            {% endif %}
         {% if comment.user == user %}
             <form method="post" action="{% url 'deletecommentfromrest' restaurant.id comment.id %}">
                 {% csrf_token %}
-                <button type="submit">Delete this comment</button>
+                <button type="submit">Delete this review</button>
             </form>
         {% endif %}
         </li>
