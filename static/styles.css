@@ -1,21 +1,121 @@
-/* styles.css */
+
+.navbar-brand {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    font-size: 30px !important;
+    font-weight: bold;
+    color: black;
+}
+
 
 .navbar.navbar-light {
-    background-color: #f0d067 !important; /* Your desired yellow color */
+    background-color: #f0d067;
 }
 
-.navbar-light .navbar-brand,
+#bar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 80px;
+}
+
 .navbar-light .nav-link {
-    color: #d32f2f !important; /* Custom color for links and brand */
+    color: #d32f2f !important;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 20px;
 }
 
+.navbar-light .navbar-brand:not([href="#"]) {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
 .navbar-nav .nav-item.active .nav-link {
-    color: #c2185b !important; /* Even darker pink */
+    color: black !important;
 }
 
 .container {
-    background-color: #ffffff; /* White background for content */
+    margin-top: 80px;
+    background-color: rgba(252, 245, 202, 0.8);
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Verdana;
+    width: 100%;
+    overflow: scroll;
+}
+
+body {
+    background-image: url("/static/images/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+h2 {
+    color: brown;
+}
+
+h1 {
+    color: brown;
+}
+
+.column {
+  width: 100%;
+  padding: 30px;
+
+}
+
+.row {
+    width: auto;
+    height: auto;
+    margin-top: 10px;
+    padding: 10px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    min-height: 150px;
+    background-color: rgb(138, 117, 98, 0.8);
+    border-radius: 20px;
+    display:flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+
+.restaurant-image {
+    margin-left: -10px;
+    width: 20%;
+    flex-wrap: nowrap;
+    min-height: 100%;
+    border: 2px solid black;
+    border-bottom-left-radius: 20px;
+    border-top-left-radius: 20px;
+}
+
+.restaurant-info {
+    width: 50%;
+    text-align: left;
+    justify-content: left;
+    margin-left: 10px;
+    flex-wrap: nowrap;
+
+}
+
+.restaurant-info p {
+    margin: 5px 0;
+}
+
+.restaurant-name {
+    font-size: 30px;
+}
+
+.check-reviews {
+
+    width: 200px;
+    height: 60px;
+}
+
+.check-reviews-div {
+    padding: 50px;
+    text-align: right;
+    flex-wrap: nowrap;
+    margin-left: auto;
 }

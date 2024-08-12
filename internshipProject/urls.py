@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from testdb.views import (HomeView, SignUpView, LogInView, ContactView, AddRestaurantView, RestaurantDetailView, ProfileView, LogoutView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView, DeleteCommentFromRestView, DeleteCommentFromProfileView, DeleteUserView)
+from testdb.views import (HomeView, SignUpView, LogInView, ContactView, AddRestaurantView, RestaurantDetailView,
+                          ProfileView, LogoutView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
+                          DeleteCommentFromRestView, DeleteCommentFromProfileView, DeleteUserView)
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,7 +36,13 @@ urlpatterns = [
     path('removemeals/<int:id>/', RemoveMealsView.as_view(), name='removemeals'),
     path('removemeal/<int:foodId>/<int:resId>/', RemoveMealView.as_view(), name='removemeal'),
     path('removerestaurant/<int:resId>/<int:userId>/', RemoveRestaurantView.as_view(), name='removerestaurant'),
-    path('deletecommentfromrest/<int:restId>/<int:commentId>/', DeleteCommentFromRestView.as_view(), name='deletecommentfromrest'),
-    path('deletecommentfromprofile/<int:commentId>/', DeleteCommentFromProfileView.as_view(), name='deletecommentfromprofile'),
+    path('deletecommentfromrest/<int:restId>/<int:commentId>/', DeleteCommentFromRestView.as_view(),
+         name='deletecommentfromrest'),
+    path('deletecommentfromprofile/<int:commentId>/', DeleteCommentFromProfileView.as_view(),
+         name='deletecommentfromprofile'),
     path('deleteuser/', DeleteUserView.as_view(), name='deleteuser'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

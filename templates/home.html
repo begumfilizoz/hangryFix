@@ -4,13 +4,21 @@
 
 {% block content %}
     <h2>Restaurants</h2>
-    <ul>
+    <div class="column">
         {% for restaurant in restaurants %}
-            <li>
-                {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.find_rating|floatformat:1 }}
+            <div class="row">
+                <div class="restaurant-image"></div>
+                <div class="restaurant-info">
+                    <p class="restaurant-name">{{ restaurant.name }}</p>
+                    <p class="restaurant-city">{{ restaurant.city }}</p>
+                    <p class="restaurant-cuisine">{{ restaurant.cuisine }}</p>
+                    <p class="restaurant-rating">{{ restaurant.find_rating|floatformat:1 }}</p>
+                </div>
+                <div class="check-reviews-div">
                 <a href="{% url 'restaurantdetail' restaurant.id %}">
-                <button>Check Reviews</button>
+                <button class="check-reviews">Check Reviews</button>
                 </a>
+                    </div>
                 {% comment %}<ul>
                     {% for food in restaurant.food_set.all %}
                         <li>{{ food.name }} - {{ food.price }}</li>
@@ -22,9 +30,9 @@
                     {% endfor %}
                 </ul>{% endcomment %}
                 
-            </li>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 
     {% comment %}<h2>Users</h2>
     <ul>

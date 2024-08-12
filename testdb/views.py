@@ -1,8 +1,8 @@
 # Create your views here.
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from .models import Restaurant, Food, User, Comment
-from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm
+from .models import Restaurant, Food, User, Comment, ContactMessage
+from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Avg
@@ -40,6 +40,19 @@ class SignUpView(View):
             auth_login(request, user)
             return redirect('home')
         return render(request, 'signup.html', {'form': form})
+
+
+class ContactView(View):
+    def get(self, request):
+        form = ContactForm()
+        return render(request, 'contact.html', {'form': form})
+
+    def post(self, request):
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        return render(request, 'contact.html', {'form': form})
 
 
 class LogInView(View):
