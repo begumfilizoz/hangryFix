@@ -14,7 +14,7 @@ class UserCreationForm(UserCreationForm):
 class AddRestaurantForm(forms.ModelForm):
     class Meta:
         model = Restaurant
-        fields = ['name', 'point', 'city', 'cuisine']
+        fields = ['name', 'city', 'cuisine']
 
 class AddMealForm(forms.ModelForm):
     class Meta:

@@ -1,0 +1,21 @@
+/* styles.css */
+
+.navbar.navbar-light {
+    background-color: #f0d067 !important; /* Your desired yellow color */
+}
+
+.navbar-light .navbar-brand,
+.navbar-light .nav-link {
+    color: #d32f2f !important; /* Custom color for links and brand */
+}
+
+.navbar-nav .nav-item.active .nav-link {
+    color: #c2185b !important; /* Even darker pink */
+}
+
+.container {
+    background-color: #ffffff; /* White background for content */
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}

@@ -74,6 +74,7 @@ class AddRestaurantView(View):
         if form.is_valid():
             restaurant = form.save(commit=False)
             restaurant.owner = request.user
+            restaurant.point = 0
             restaurant.save()
             return redirect('home')
         return render(request, 'addrestaurant.html', {'form': form})
