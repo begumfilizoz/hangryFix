@@ -9,7 +9,9 @@
         <li>{{ food.name }} - {{ food.price }}
             <form method="post" action="{% url 'removemeal' food.id restaurant.id %}">
                 {% csrf_token %}
-                <button type="submit">Remove This Meal</button>
+                <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                        onmouseover="this.style.backgroundColor='brown';" 
+                        onmouseout="this.style.backgroundColor='#f0d067';">Remove This Meal</button>
             </form>
         </li>
     {% endfor %}

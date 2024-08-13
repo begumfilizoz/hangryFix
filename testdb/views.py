@@ -83,7 +83,7 @@ class AddRestaurantView(View):
         return render(request, 'addrestaurant.html', {'form': form})
 
     def post(self, request):
-        form = AddRestaurantForm(request.POST)
+        form = AddRestaurantForm(request.POST, request.FILES)
         if form.is_valid():
             restaurant = form.save(commit=False)
             restaurant.owner = request.user
@@ -110,6 +110,12 @@ class RestaurantDetailView(View):
             comment.save()
             return redirect('restaurantdetail', id=restaurant.id)
         return render(request, 'restaurantdetail.html', {'restaurant': restaurant, 'form': form})
+
+
+class MenuView(View):
+    def get(self, request, id):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        return render(request, 'menu.html', {'restaurant': restaurant})
 
 
 class DeleteCommentFromRestView(View):
@@ -142,6 +148,13 @@ class LogoutView(View):
         return redirect('home')
 
 
+class MakeUserOwnerView(View):
+    def post(self, request):
+        request.user.isOwner = True
+        request.user.save()
+        return redirect('profile', id=request.user.id)
+
+
 class AddMealView(View):
     def get(self, request, id):
         form = AddMealForm()
@@ -149,7 +162,7 @@ class AddMealView(View):
         return render(request, 'addmeal.html', {'form': form, 'restaurant': restaurant})
 
     def post(self, request, id):
-        form = AddMealForm(request.POST)
+        form = AddMealForm(request.POST, request.FILES)
         if form.is_valid():
             restaurant = get_object_or_404(Restaurant, id=id)
             meal = form.save(commit=False)

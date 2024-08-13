@@ -3,39 +3,55 @@
 {% block title %}restaurant.name{% endblock %}
 
 {% block content %}
+    <div class="restaurant-detail-image"><img src="{{ restaurant.image.url }}"></div>
     <h1>{{ restaurant.name }}</h1>
-    <p>Rating: {{ rating|floatformat:1 }}</p>
-    <p>City: {{ restaurant.city }}</p>
-    <p>Cuisine: {{ restaurant.cuisine }}</p>
-    <a href="{% url 'home' %}"><button>Back to Home</button></a>
-    <p>Menu:</p>
-    {% for food in restaurant.food_set.all %}
-        <li>{{ food.name }} - {{ food.price }} : {{ food.description }}</li>
-    {% endfor %}
+    <p style="font-weight: bold; color: brown"><i class="fa-solid fa-star"></i>  Rating: {{ rating|floatformat:1 }}</p>
+    <p style="font-weight: bold; color: brown"><i class="fa-solid fa-map-location-dot"></i>  City: {{ restaurant.city }}</p>
+    <p style="font-weight: bold; color: brown"><i class="fa-solid fa-utensils"></i>   Cuisine: {{ restaurant.cuisine }}</p>
+    <a href="{% url 'home' %}"><button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">Back to Home</button></a>
+
+    <a href="{% url 'menu' restaurant.id %}">
+        <button class="back-to-restaurant" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">
+        Check Menu</button>
+    </a>
     <br />
-    <p>Comments:</p>
+    <h3><br>Comments:</h3>
     {% if user.is_authenticated %}
-        <p>Add your review: </p>
+        <h5>Add your review:<br></h5>
             <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Publish</button>
+                <div class="form">
+                    {{ form.as_p }}
+                </div>
+            <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">Publish</button>
             </form>
     {% else %}
         <p>Login to add a review</p>
     {% endif %}
+    <div class="column">
     {% for comment in restaurant.comment_set.all %}
-        <li>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars
+        <div class="row2" style="font-size: 16px; color: white"><br>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars
             {% if comment.comment %} 
             : {{ comment.comment }} 
             {% endif %}
         {% if comment.user == user %}
             <form method="post" action="{% url 'deletecommentfromrest' restaurant.id comment.id %}">
                 {% csrf_token %}
-                <button type="submit">Delete this review</button>
+                <div class="deleterevdiv">
+                <button class="delete-review" type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">Delete this review</button>
+                </div>
             </form>
         {% endif %}
-        </li>
+        </div>
     {% endfor %}
+    </div>
     
 {% endblock %}

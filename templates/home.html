@@ -7,16 +7,19 @@
     <div class="column">
         {% for restaurant in restaurants %}
             <div class="row">
-                <div class="restaurant-image"></div>
+                <div class="restaurant-image"><img src="{{ restaurant.image.url }}"></div>
                 <div class="restaurant-info">
-                    <p class="restaurant-name">{{ restaurant.name }}</p>
-                    <p class="restaurant-city">{{ restaurant.city }}</p>
-                    <p class="restaurant-cuisine">{{ restaurant.cuisine }}</p>
-                    <p class="restaurant-rating">{{ restaurant.find_rating|floatformat:1 }}</p>
+                    <p class="restaurant-name" style="color:#f0d067">{{ restaurant.name }}</p>
+                    <p class="restaurant-city" style="color:#4a0d0d"><i class="fa-solid fa-map-location-dot"></i>  {{ restaurant.city }}</p>
+                    <p class="restaurant-cuisine" style="color:#4a0d0d"><i class="fa-solid fa-utensils"></i>  {{ restaurant.cuisine }} Cuisine</p>
+                    <h3 class="restaurant-rating" style="color:#965500; font-weight: bold"><i class="fa-solid fa-star"></i>  {{ restaurant.find_rating|floatformat:1 }}</h3>
                 </div>
                 <div class="check-reviews-div">
                 <a href="{% url 'restaurantdetail' restaurant.id %}">
-                <button class="check-reviews">Check Reviews</button>
+                <button class="check-reviews" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                        onmouseover="this.style.backgroundColor='brown';" 
+                        onmouseout="this.style.backgroundColor='#f0d067';">
+                    Check Reviews</button>
                 </a>
                     </div>
                 {% comment %}<ul>

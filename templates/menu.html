@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}restaurant.name{% endblock %}
+
+{% block content %}
+    <h1>{{ restaurant.name }}</h1>
+    <a href="{% url 'restaurantdetail' restaurant.id %}">
+        <button class="back-to-restaurant" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                        onmouseover="this.style.backgroundColor='brown';" 
+                        onmouseout="this.style.backgroundColor='#f0d067';">
+        Go Back to Restaurant Page</button>
+    </a>
+    <div class="column">
+     {% for food in restaurant.food_set.all %}
+         <div class="row">
+         <div class="food-image"><img src="{{ food.image.url }}"></div>
+         <div class="food-info">
+            <p style="color: brown" class="food-name">{{ food.name }}</p>
+            <p style="color: brown; font-weight: bold"><i class="fa-solid fa-money-bill"></i> {{ food.price }} </p> 
+             <p><i>{{ food.description }}</i></p>
+        </div>
+         </div>
+    {% endfor %}
+    </div>
+    
+{% endblock %}

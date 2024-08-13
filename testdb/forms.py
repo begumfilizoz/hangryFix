@@ -13,15 +13,17 @@ class UserCreationForm(UserCreationForm):
 
 
 class AddRestaurantForm(forms.ModelForm):
+    image = forms.ImageField(required=False)
     class Meta:
         model = Restaurant
-        fields = ['name', 'city', 'cuisine']
+        fields = ['name', 'city', 'cuisine', 'image']
 
 
 class AddMealForm(forms.ModelForm):
+    image = forms.ImageField(required=False)
     class Meta:
         model = Food
-        fields = ['name', 'price', 'description']
+        fields = ['name', 'price', 'description', 'image']
 
 
 class AddCommentForm(forms.ModelForm):

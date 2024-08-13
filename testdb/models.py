@@ -18,6 +18,7 @@ class Restaurant(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     cuisine = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='restaurant-images/', default='images/restaurant.jpg')
     point = models.FloatField()
     def __str__(self):
         return self.name
@@ -32,6 +33,7 @@ class Food(models.Model):
     name = models.CharField(max_length=100)
     price = models.FloatField()
     description = models.CharField(max_length=300)
+    image = models.ImageField(upload_to='food-images/', default='images/food.jpg')
 
     def __str__(self):
         return self.name

@@ -5,7 +5,11 @@
     <h2>Contact</h2>
     <form method="post">
         {% csrf_token %}
+        <div class="form">
         {{ form.as_p }}
-        <button type="submit">Submit</button>
+        </div>
+        <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                        onmouseover="this.style.backgroundColor='brown';" 
+                        onmouseout="this.style.backgroundColor='#f0d067';">Submit</button>
     </form>
 {% endblock %}

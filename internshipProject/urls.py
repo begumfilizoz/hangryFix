@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from testdb.views import (HomeView, SignUpView, LogInView, ContactView, AddRestaurantView, RestaurantDetailView,
                           ProfileView, LogoutView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
-                          DeleteCommentFromRestView, DeleteCommentFromProfileView, DeleteUserView)
+                          DeleteCommentFromRestView, DeleteCommentFromProfileView, DeleteUserView, MenuView, MakeUserOwnerView)
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -30,6 +30,7 @@ urlpatterns = [
     path('contact/', ContactView.as_view(), name='contact'),
     path('addrestaurant/', AddRestaurantView.as_view(), name='addrestaurant'),
     path('restaurant/<int:id>/', RestaurantDetailView.as_view(), name='restaurantdetail'),
+    path('menu/<int:id>/', MenuView.as_view(), name='menu'),
     path('profile/<int:id>/', ProfileView.as_view(), name='profile'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('addmeal/<int:id>/', AddMealView.as_view(), name='addmeal'),
@@ -41,8 +42,5 @@ urlpatterns = [
     path('deletecommentfromprofile/<int:commentId>/', DeleteCommentFromProfileView.as_view(),
          name='deletecommentfromprofile'),
     path('deleteuser/', DeleteUserView.as_view(), name='deleteuser'),
-]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
+    path('makeuseranowner/', MakeUserOwnerView.as_view(), name='makeuserowner'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
