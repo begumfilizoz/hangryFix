@@ -22,6 +22,9 @@ class UserCreationForm(UserCreationForm):
 class AddRestaurantForm(forms.ModelForm):
     image = forms.ImageField(required=False)
     cuisine = forms.ModelChoiceField(queryset=Cuisine.objects.all(), required=True)
+    country = forms.ModelChoiceField(queryset=Country.objects.all(), required=True)
+    city = forms.ModelChoiceField(queryset=City.objects.all(), required=True)
+    name = forms.CharField(required=True)
 
     class Meta:
         model = Restaurant

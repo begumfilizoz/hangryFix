@@ -21,7 +21,7 @@ class Cuisine(models.Model):
 
 class Restaurant(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, blank=True)
     cuisine = models.ForeignKey(Cuisine, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True)

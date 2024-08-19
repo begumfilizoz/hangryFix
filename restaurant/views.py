@@ -34,10 +34,10 @@ class RestrictedHomeView(View):
         restaurants = Restaurant.objects.filter(**filters).order_by('point')
         print(filters)
         if pageno != -1:
+            if (pageno + 1) * 5 > restaurants.count():
+                next_exists = False
             restaurants = restaurants[pageno * 5:pageno * 5 + 5]
         users = User.objects.all()
-        if (pageno + 1) * 5 > restaurants.count():
-           next_exists = False
         context = {
             'restaurants': restaurants,
             'users': users,
@@ -70,10 +70,11 @@ class PrevPageView(View):
         print(filters)
         if pageno > 0:
             pageno = pageno - 1
+            if (pageno + 1) * 5 > restaurants.count():
+                next_exists = False
             restaurants = restaurants[pageno * 5:pageno * 5 + 5]
         users = User.objects.all()
-        if (pageno + 1) * 5 > restaurants.count():
-           next_exists = False
+
         context = {
             'restaurants': restaurants,
             'users': users,
@@ -107,10 +108,11 @@ class NextPageView(View):
         print(filters)
         if pageno != -1:
             pageno = pageno + 1
+            if (pageno + 1) * 5 > restaurants.count():
+                next_exists = False
             restaurants = restaurants[pageno * 5:pageno * 5 + 5]
         users = User.objects.all()
-        if (pageno + 1) * 5 > restaurants.count():
-           next_exists = False
+
         context = {
             'restaurants': restaurants,
             'users': users,
