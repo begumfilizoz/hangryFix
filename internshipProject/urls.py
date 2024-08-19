@@ -16,15 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from testdb.views import (HomeView, SignUpView, LogInView, ContactView, AddRestaurantView, RestaurantDetailView,
-                          ProfileView, LogoutView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
-                          DeleteCommentFromRestView, DeleteCommentFromProfileView, DeleteUserView, MenuView, MakeUserOwnerView)
+from restaurant.views import (HomeView, SignUpView, LogInView, ContactView, AddRestaurantView, RestaurantDetailView,
+                              ProfileView, LogoutView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
+                              DeleteCommentFromRestView, DeleteCommentFromProfileView, DeleteUserView, MenuView, MakeUserOwnerView, GetCitiesAndCountriesView, LikeUnlikeReviewView, RestrictedHomeView, SearchView, NextPageView, PrevPageView)
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HomeView.as_view(), name='home'),
+    path('home/', HomeView.as_view(), name='home'),
+    path('', SearchView.as_view(), name='search'),
+    path('restrictedhome/<str:link>/<int:pageno>/', RestrictedHomeView.as_view(), name='restrictedhome'),
+    path('nextpage/<str:link>/<int:pageno>', NextPageView.as_view(), name='nextpage'),
+    path('prevpage/<str:link>/<int:pageno>', PrevPageView.as_view(), name='prevpage'),
     path('signup/', SignUpView.as_view(), name='signup'),
     path('login/', LogInView.as_view(), name='login'),
     path('contact/', ContactView.as_view(), name='contact'),
@@ -43,4 +47,6 @@ urlpatterns = [
          name='deletecommentfromprofile'),
     path('deleteuser/', DeleteUserView.as_view(), name='deleteuser'),
     path('makeuseranowner/', MakeUserOwnerView.as_view(), name='makeuserowner'),
+    path('getcitiesandcountries/', GetCitiesAndCountriesView.as_view(), name='getcitiesandcountries'),
+    path('likeunlikecomment/<int:id>/', LikeUnlikeReviewView.as_view(), name='likeunlikecomment'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

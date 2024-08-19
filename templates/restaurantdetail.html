@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-{% block title %}restaurant.name{% endblock %}
+{% block title %}{{ restaurant.name }}{% endblock %}
 
 {% block content %}
     <div class="restaurant-detail-image"><img src="{{ restaurant.image.url }}"></div>
     <h1>{{ restaurant.name }}</h1>
     <p style="font-weight: bold; color: brown"><i class="fa-solid fa-star"></i>  Rating: {{ rating|floatformat:1 }}</p>
-    <p style="font-weight: bold; color: brown"><i class="fa-solid fa-map-location-dot"></i>  City: {{ restaurant.city }}</p>
+    <p style="font-weight: bold; color: brown"><i class="fa-solid fa-map-location-dot"></i>  City: {{ restaurant.city.name }}, {{ restaurant.country.name }}</p>
     <p style="font-weight: bold; color: brown"><i class="fa-solid fa-utensils"></i>   Cuisine: {{ restaurant.cuisine }}</p>
-    <a href="{% url 'home' %}"><button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+    <a href="{% url 'search' %}"><button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';"
                         onmouseout="this.style.backgroundColor='#f0d067';">Back to Home</button></a>
 
@@ -20,6 +20,7 @@
     </a>
     <br />
     <h3><br>Comments:</h3>
+    <h5> {{ restaurant.comment_set.all.count }} reviews</h5>
     {% if user.is_authenticated %}
         <h5>Add your review:<br></h5>
             <form method="post">
@@ -32,24 +33,49 @@
                         onmouseout="this.style.backgroundColor='#f0d067';">Publish</button>
             </form>
     {% else %}
-        <p>Login to add a review</p>
+        <p>Login to add a review and like them</p>
     {% endif %}
     <div class="column">
     {% for comment in restaurant.comment_set.all %}
-        <div class="row2" style="font-size: 16px; color: white"><br>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars
-            {% if comment.comment %} 
-            : {{ comment.comment }} 
-            {% endif %}
+        <div class="row2" style="font-size: 16px; color: white; padding: 20px"><h5>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars
+            {% if comment.comment %}
+            :<br>{{ comment.comment }}
+            {% endif %}</h5>
+
+        <div style="text-align: center">
+        <p style="height: 20px; margin: auto; margin-top: 5px">{{ comment.like_set.all.count }} likes</p>
         {% if comment.user == user %}
             <form method="post" action="{% url 'deletecommentfromrest' restaurant.id comment.id %}">
                 {% csrf_token %}
-                <div class="deleterevdiv">
-                <button class="delete-review" type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                <div class="deleterevdiv" style="height: 50px; text-align: center; padding: 20px">
+                <button class="delete-review" type="submit" style="margin: auto; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';"
-                        onmouseout="this.style.backgroundColor='#f0d067';">Delete this review</button>
+                        onmouseout="this.style.backgroundColor='#f0d067';" onclick="return confirm('Are you sure that you want to delete this review?');">Delete this review</button>
                 </div>
             </form>
         {% endif %}
+        {% if user.is_authenticated %}
+            {% if comment in liked_comments %}
+                <form method="post" action="{% url 'likeunlikecomment' comment.id %}">
+                     {% csrf_token %}
+                    <div style="height: 50px; justify-content: center; text-align: center; padding: 20px">
+                    <button class="unlike" style="margin: auto; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">Unlike</button>
+                    </div>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'likeunlikecomment' comment.id %}">
+                     {% csrf_token %}
+                    <div style="height: 50px; justify-content: center; text-align: center; padding: 20px">
+                    <button class="like" style="margin:auto; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">Like</button>
+                    </div>
+                </form>
+            {% endif %}
+        {% endif %}
+        </div>
         </div>
     {% endfor %}
     </div>

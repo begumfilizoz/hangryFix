@@ -1,7 +1,14 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from testdb.models import User, Restaurant, Food, Comment, ContactMessage
+from restaurant.models import User, Restaurant, Food, Comment, ContactMessage, Cuisine
 from django.core.validators import MaxValueValidator, MinValueValidator
+from cities_light.models import City, Country
+
+
+class SearchRestaurantForm(forms.Form):
+    country = forms.ModelChoiceField(queryset=Country.objects.all(), label='Country', required=False)
+    city = forms.ModelChoiceField(queryset=City.objects.all(), label='City', required=False)
+    cuisine = forms.ModelChoiceField(queryset=Cuisine.objects.all(), label='Cuisine', required=False)
 
 
 class UserCreationForm(UserCreationForm):
@@ -9,18 +16,26 @@ class UserCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'name', 'isOwner', 'location', 'password1', 'password2']
+        fields = ['username', 'email', 'name', 'isOwner', 'password1', 'password2']
 
 
 class AddRestaurantForm(forms.ModelForm):
     image = forms.ImageField(required=False)
+    cuisine = forms.ModelChoiceField(queryset=Cuisine.objects.all(), required=True)
+
     class Meta:
         model = Restaurant
-        fields = ['name', 'city', 'cuisine', 'image']
+        fields = ['name', 'country', 'city', 'cuisine', 'image']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['city'].queryset = City.objects.all()
+        self.fields['country'].queryset = Country.objects.all()
 
 
 class AddMealForm(forms.ModelForm):
     image = forms.ImageField(required=False)
+
     class Meta:
         model = Food
         fields = ['name', 'price', 'description', 'image']

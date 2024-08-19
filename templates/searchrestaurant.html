@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Add Your Restaurant{% endblock %}
+{% block title %}Search Restaurant{% endblock %}
+
 {% block content %}
-    <h2>Add Your Restaurant</h2>
+    <h2>Search a Restaurant</h2>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form">
@@ -12,9 +13,9 @@
         </div>
         <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                         onmouseover="this.style.backgroundColor='brown';" 
-                        onmouseout="this.style.backgroundColor='#f0d067';">Add</button>
+                        onmouseout="this.style.backgroundColor='#f0d067';">Search</button>
     </form>
-     <script>
+    <script>
 
        $('#id_city').select2();
        $('#id_country').select2();

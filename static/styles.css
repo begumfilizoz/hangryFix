@@ -91,7 +91,7 @@ h1 {
     padding: 10px;
     padding-bottom: 0px;
     padding-top: 0px;
-    min-height: 70px;
+    min-height: 150px;
     max-height: 200px;
     background-color: rgb(138, 117, 98, 0.8);
     border-radius: 20px;
@@ -199,6 +199,37 @@ button.check-reviews {
     width: 100%;
 }
 
+#id_city {
+    background-color: #f7e3a1;
+    border: solid;
+    width: 200px;
+}
+
+#id_country {
+    background-color: #f7e3a1;
+    border: solid;
+    width: 200px;
+}
+
+#select2-id_country-container {
+    background-color: #f7e3a1;
+    border: solid;
+    width: 200px;
+}
+
+#select2-id_city-container {
+    background-color: #f7e3a1;
+    border: solid;
+    width: 200px;
+    font-size: 14px;
+}
+
+#id_cuisine {
+    background-color: #f7e3a1;
+    border: solid;
+    width: 200px;
+}
+
 .restaurant-detail-image {
     width: 100%;
     height: 300px;
@@ -229,6 +260,5 @@ button.check-reviews {
     height: 100%;
     object-fit: cover;
 
-
-
 }
+
