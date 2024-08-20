@@ -27,6 +27,8 @@ class Restaurant(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to='restaurant-images/', default='images/restaurant.jpg')
     point = models.FloatField()
+    lat = models.FloatField(default=0)
+    lng = models.FloatField(default=0)
     def __str__(self):
         return self.name
 

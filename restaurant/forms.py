@@ -25,10 +25,12 @@ class AddRestaurantForm(forms.ModelForm):
     country = forms.ModelChoiceField(queryset=Country.objects.all(), required=True)
     city = forms.ModelChoiceField(queryset=City.objects.all(), required=True)
     name = forms.CharField(required=True)
+    lat = forms.FloatField(required=True)
+    lng = forms.FloatField(required=True)
 
     class Meta:
         model = Restaurant
-        fields = ['name', 'country', 'city', 'cuisine', 'image']
+        fields = ['name', 'country', 'city', 'cuisine', 'image', 'lat', 'lng']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

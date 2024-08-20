@@ -19,6 +19,10 @@
         Check Menu</button>
     </a>
     <br />
+    <br />
+    <p style="font-weight: bold; color: brown">Map:</p>
+    <div style="text-align: center; width: 600px; height: auto">{{ map_html|safe }}</div>
+    <br />
     <h3><br>Comments:</h3>
     <h5> {{ restaurant.comment_set.all.count }} reviews</h5>
     {% if user.is_authenticated %}

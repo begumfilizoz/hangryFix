@@ -10,6 +10,7 @@ from django.db.models import Avg
 from django.http import JsonResponse
 from cities_light.models import City, Country
 from django.contrib import messages
+import folium
 
 
 class RestrictedHomeView(View):
@@ -249,7 +250,12 @@ class RestaurantDetailView(View):
                     liked_comments.append(like.comment)
         rating = restaurant.find_rating()
         form = AddCommentForm()
-        return render(request, 'restaurantdetail.html', {'liked_comments': liked_comments, 'restaurant': restaurant, 'form': form, 'rating': rating})
+        m = folium.Map(location=[restaurant.lat, restaurant.lng], zoom_start=15)
+        folium.Marker([restaurant.lat, restaurant.lng], popup=restaurant.name).add_to(m)
+
+        # Save the map to an HTML file or buffer
+        map_html = m._repr_html_()
+        return render(request, 'restaurantdetail.html', {'map_html': map_html, 'liked_comments': liked_comments, 'restaurant': restaurant, 'form': form, 'rating': rating})
 
     def post(self, request, id):
         restaurant = get_object_or_404(Restaurant, id=id)
