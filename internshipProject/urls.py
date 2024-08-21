@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from restaurant.views import (HomeView, SignUpView, LogInView, ContactView, AddRestaurantView, RestaurantDetailView,
-                              ProfileView, LogoutView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
-                              DeleteCommentFromRestView, DeleteCommentFromProfileView, DeleteUserView, MenuView, MakeUserOwnerView, GetCitiesAndCountriesView, LikeUnlikeReviewView, RestrictedHomeView, SearchView, NextPageView, PrevPageView)
+from restaurant.home_views import (HomeView, RestrictedHomeView, SearchView, NextPageView, PrevPageView)
+from restaurant.restaurant_views import (AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
+                              DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView)
+from restaurant.user_action_views import (SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView)
+
 from django.conf import settings
 from django.conf.urls.static import static
 

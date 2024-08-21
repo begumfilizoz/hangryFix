@@ -6,6 +6,7 @@ from cities_light.models import City, Country
 
 
 class SearchRestaurantForm(forms.Form):
+    name = forms.CharField(label='Restaurant Name', max_length=200, required=False)
     country = forms.ModelChoiceField(queryset=Country.objects.all(), label='Country', required=False)
     city = forms.ModelChoiceField(queryset=City.objects.all(), label='City', required=False)
     cuisine = forms.ModelChoiceField(queryset=Cuisine.objects.all(), label='Cuisine', required=False)

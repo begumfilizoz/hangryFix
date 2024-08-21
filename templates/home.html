@@ -4,6 +4,9 @@
 
 {% block content %}
     <h2>Restaurants</h2>
+    {% if restaurants.count == 0 %}
+        <p>No restaurants found</p>
+    {% endif %}
     <div class="column">
         {% for restaurant in restaurants %}
             <div class="row">

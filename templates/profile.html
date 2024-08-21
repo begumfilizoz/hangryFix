@@ -19,10 +19,11 @@
     </form>
     <h2><br>Your Reviews:</h2>
     {% for comment in comments %}
-        <li>For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
+        <li style="border: solid; border-color: brown;">For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
             {% if comment.comment %} 
-                and this review: {{ comment.comment }}
+                and this review: {{ comment.comment }} <br>
             {% endif %}
+            ({{ comment.date }})
             <form method="post" action="{% url 'deletecommentfromprofile' comment.id %}">
                 {% csrf_token %}
                 <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
@@ -42,32 +43,34 @@
     {% endif %}
     {% if user.isOwner %}
         <h2>Your Restaurants</h2>
+        <br>
         <a href="{% url 'addrestaurant' %}">
         <button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">Add Your Restaurant</button>
         </a>
+        <p></p>
         {% for restaurant in restaurants %}
-            <li>
+            <li style="border: solid; border-color: brown;">
                 {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.find_rating|floatformat:1 }}
                 <a href="{% url 'restaurantdetail' restaurant.id %}">
-                <button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                <button style="font-size: 12px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">Check Reviews</button>
                 </a>
                 <a href="{% url 'addmeal' restaurant.id %}">
-                <button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                <button style="font-size: 12px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">Add a Meal</button>
                 </a>
                 <a href="{% url 'removemeals' restaurant.id %}">
-                <button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                <button style="font-size: 12px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">Remove Meals</button>
                 </a>
                 <form method="post" action="{% url 'removerestaurant' restaurant.id user.id %}">
                 {% csrf_token %}
-                <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                <button type="submit" style="font-size: 12px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';" onclick="return confirm('Are you sure that you want to delete this restaurant?');">Remove Restaurant</button>
                 </form>

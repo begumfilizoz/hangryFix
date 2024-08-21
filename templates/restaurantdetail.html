@@ -41,9 +41,9 @@
     {% endif %}
     <div class="column">
     {% for comment in restaurant.comment_set.all %}
-        <div class="row2" style="font-size: 16px; color: white; padding: 20px"><h5>{{ comment.user.name }} gave this restaurant {{ comment.rating }} stars
+        <div class="row2" style="font-size: 16px; color: white; padding: 20px"><h5><strong>{{ comment.user.name }}</strong><i> gave this restaurant {{ comment.rating }} stars ({{ comment.date }})</i>
             {% if comment.comment %}
-            :<br>{{ comment.comment }}
+            :<br><br>{{ comment.comment }}
             {% endif %}</h5>
 
         <div style="text-align: center; width: 40%">
