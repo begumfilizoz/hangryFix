@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from restaurant.models import User, Restaurant, Food, Comment, ContactMessage, Cuisine
+from restaurant.models import User, Restaurant, Food, Comment, ContactMessage, Cuisine, Booking
 from django.core.validators import MaxValueValidator, MinValueValidator
 from cities_light.models import City, Country
 
@@ -62,3 +62,27 @@ class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
         fields = ['name', 'email', 'message']
+
+
+class BookingForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+        fields = ['date', 'time']
+        widgets = {
+            'date': forms.widgets.DateInput(attrs={'type': 'date'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.restaurant = kwargs.pop('restaurant', None)
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date = cleaned_data.get('date')
+        time = cleaned_data.get('time')
+
+        if self.restaurant and date and time:
+            if Booking.objects.filter(restaurant=self.restaurant, date=date).exists():
+                raise forms.ValidationError("You already booked this restaurant at the selected date.")
+        return cleaned_data

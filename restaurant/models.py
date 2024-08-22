@@ -9,6 +9,7 @@ from django.utils.timezone import now
 class User(AbstractUser):
     isOwner = models.BooleanField(default=False)
     name = models.CharField(max_length=100)
+
     # location = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -21,6 +22,7 @@ class Cuisine(models.Model):
     def __str__(self):
         return self.name
 
+
 class Restaurant(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100, blank=True)
@@ -31,6 +33,7 @@ class Restaurant(models.Model):
     point = models.FloatField()
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
+
     def __str__(self):
         return self.name
 
@@ -56,6 +59,7 @@ class Comment(models.Model):
     rating = models.FloatField()
     comment = models.TextField(blank=True, null=True)
     date = models.DateTimeField(default=now, editable=False)
+
     def __str__(self):
         return self.comment
 
@@ -75,3 +79,16 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Booking(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateField(default=now)
+    time = models.TimeField(default=now)
+
+    class Meta:
+        unique_together = ('restaurant', 'user', 'date')
+
+    def __str__(self):
+        return self.restaurant.name

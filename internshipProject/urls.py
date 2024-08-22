@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from restaurant.home_views import (HomeView, RestrictedHomeView, SearchView, NextPageView, PrevPageView)
 from restaurant.restaurant_views import (AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
-                              DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView)
+                              DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView, BookingView)
 from restaurant.user_action_views import (SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView)
 
 from django.conf import settings
@@ -36,6 +36,7 @@ urlpatterns = [
     path('contact/', ContactView.as_view(), name='contact'),
     path('addrestaurant/', AddRestaurantView.as_view(), name='addrestaurant'),
     path('restaurant/<int:id>/', RestaurantDetailView.as_view(), name='restaurantdetail'),
+    path('bookatable/<int:id>/', BookingView.as_view(), name='bookatable'),
     path('menu/<int:id>/', MenuView.as_view(), name='menu'),
     path('profile/<int:id>/', ProfileView.as_view(), name='profile'),
     path('logout/', LogoutView.as_view(), name='logout'),

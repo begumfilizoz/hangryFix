@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.core.serializers import serialize
 from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine
-from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm, SearchRestaurantForm
+from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm, SearchRestaurantForm, BookingForm
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Avg
@@ -65,6 +65,9 @@ class RestaurantDetailView(View):
             comment.restaurant = restaurant
             comment.user = request.user
             comment.save()
+            rating = restaurant.find_rating()
+            restaurant.point = rating
+            restaurant.save()
             return redirect('restaurantdetail', id=restaurant.id)
         return render(request, 'restaurantdetail.html', {'restaurant': restaurant, 'form': form})
 
@@ -137,3 +140,23 @@ class RemoveRestaurantView(View):
         restaurant = get_object_or_404(Restaurant, id=resId)
         restaurant.delete()
         return redirect('profile', id=userId)
+
+
+class BookingView(View):
+    def get(self, request, id):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        form = BookingForm(restaurant=restaurant)
+        return render(request, 'bookrestaurant.html', {"restaurant": restaurant, "form": form})
+
+    def post(self, request, id):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        form = BookingForm(request.POST, restaurant=restaurant)
+
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.restaurant = restaurant
+            booking.user = request.user
+            booking.save()
+            messages.success(request, 'You successfully booked the restaurant.')
+            return redirect('restaurantdetail', id=restaurant.id)
+        return render(request, 'bookrestaurant.html', {"restaurant": restaurant, "form": form})

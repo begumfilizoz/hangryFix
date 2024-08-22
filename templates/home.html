@@ -9,10 +9,13 @@
     {% endif %}
     <div class="column">
         {% for restaurant in restaurants %}
+            
             <div class="row">
                 <div class="restaurant-image"><img src="{{ restaurant.image.url }}"></div>
                 <div class="restaurant-info">
+                    <a href="{% url 'restaurantdetail' restaurant.id %}">
                     <p class="restaurant-name" style="color:#f0d067">{{ restaurant.name }}</p>
+                    </a>
                     <p class="restaurant-city" style="color:#4a0d0d"><i class="fa-solid fa-map-location-dot"></i>  {{ restaurant.city.name }}, {{ restaurant.country.name }}</p>
                     <p class="restaurant-cuisine" style="color:#4a0d0d"><i class="fa-solid fa-utensils"></i>  {{ restaurant.cuisine }} Cuisine</p>
                     <h3 class="restaurant-rating" style="color:#965500; font-weight: bold"><i class="fa-solid fa-star"></i>  {{ restaurant.find_rating|floatformat:1 }}</h3>

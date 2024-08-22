@@ -18,6 +18,12 @@
                         onmouseout="this.style.backgroundColor='#f0d067';">
         Check Menu</button>
     </a>
+    <a href="{% url 'bookatable' restaurant.id %}">
+        <button class="back-to-restaurant" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">
+        Book a Table</button>
+    </a>
     <br />
     <br />
     <p style="font-weight: bold; color: brown">Map:</p>

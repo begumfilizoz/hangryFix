@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Book a Table at {{ restaurant.name }}{% endblock %}
+{% block content %}
+    <h2>Book a Table at {{ restaurant.name }}</h2>
+    {% if user.is_authenticated %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form">
+        {{ form.as_p }}
+        </div>
+        <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                        onmouseover="this.style.backgroundColor='brown';" 
+                        onmouseout="this.style.backgroundColor='#f0d067';">Book</button>
+    </form>
+    {% else %}
+        <p>This service is only available to logged-in users.</p>
+        <a href="{% url 'login' %}">
+        <button class="back-to-restaurant" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">
+        Log in to book a table</button>
+    </a>
+    {% endif %}
+{% endblock %}
