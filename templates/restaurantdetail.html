@@ -4,8 +4,23 @@
 
 {% block content %}
     <div class="restaurant-detail-image"><img src="{{ restaurant.image.url }}"></div>
-    <h1>{{ restaurant.name }}</h1>
-    <p style="font-weight: bold; color: brown"><i class="fa-solid fa-star"></i>  Rating: {{ rating|floatformat:1 }}</p>
+    {% if restaurant_in_favorites %}
+        <h1>{{ restaurant.name }}</h1>
+        <h5 style="color: brown">
+        <form method="post" action="{% url 'removefromfavorites' restaurant.id pageno %}" style="color: brown">{% csrf_token %} <button type="submit" style="background: none; border: none; padding: 0;">
+                <i style="color: brown" class="fa-solid fa-heart"></i>  Remove From Your Favorites <br>
+        </button></form>
+        </h5>
+    {% else %}
+      <h1>{{ restaurant.name }}</h1>
+        <h5 style="color: brown">
+        <form method="post" action="{% url 'addtofavorites' restaurant.id pageno %}" style="color: brown">{% csrf_token %}<button type="submit" style="background: none; border: none; padding: 0;">
+                <i style="color: brown" class="fa-regular fa-heart"></i>  Add To Your Favorites <br>
+            </button></form>
+        </h5>
+    {% endif %}
+
+    <p style="font-weight: bold; color: brown"><br><i class="fa-solid fa-star"></i>  Rating: {{ rating|floatformat:1 }}</p>
     <p style="font-weight: bold; color: brown"><i class="fa-solid fa-map-location-dot"></i>  City: {{ restaurant.city.name }}, {{ restaurant.country.name }}</p>
     <p style="font-weight: bold; color: brown"><i class="fa-solid fa-utensils"></i>   Cuisine: {{ restaurant.cuisine }}</p>
     <a href="{% url 'search' %}"><button style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
@@ -46,14 +61,26 @@
         <p>Login to add a review and like them</p>
     {% endif %}
     <div class="column">
-    {% for comment in restaurant.comment_set.all %}
-        <div class="row2" style="font-size: 16px; color: white; padding: 20px"><h5><strong>{{ comment.user.name }}</strong><i> gave this restaurant {{ comment.rating }} stars ({{ comment.date }})</i>
+    {% for comment in comments %}
+        <div class="row2" style="font-size: 16px; color: white; padding: 20px">
+            {% if comment.user != user %}
+            <h5 style="font-size: 16px">
+                <a href="{% url 'otherprofile' comment.user.id %}">
+                <strong style="color:brown">{{ comment.user.name }}</strong>
+                </a>
+                <i> gave this restaurant {{ comment.rating }} stars ({{ comment.date }})</i>
             {% if comment.comment %}
             :<br><br>{{ comment.comment }}
             {% endif %}</h5>
+                {% else %}
+                <h5 style="font-size: 16px"><strong>You</strong><i> gave this restaurant {{ comment.rating }} stars ({{ comment.date }})</i>
+            {% if comment.comment %}
+            :<br><br>{{ comment.comment }}
+            {% endif %}</h5>
+            {% endif %}
 
         <div style="text-align: center; width: 40%">
-        <p style="height: 20px; margin: auto; margin-top: 5px">{{ comment.like_set.all.count }} likes</p>
+        <p style="height: 20px; margin: auto; margin-top: -5px; margin-bottom: -3px">{{ comment.like_set.all.count }} likes</p>
         {% if comment.user == user %}
             <form method="post" action="{% url 'deletecommentfromrest' restaurant.id comment.id %}">
                 {% csrf_token %}
@@ -66,19 +93,19 @@
         {% endif %}
         {% if user.is_authenticated %}
             {% if comment in liked_comments %}
-                <form method="post" action="{% url 'likeunlikecomment' comment.id %}">
+                <form method="post" action="{% url 'likeunlikecomment' comment.id pageno %}">
                      {% csrf_token %}
-                    <div style="height: 50px; justify-content: center; text-align: center; padding: 20px">
+                    <div style="height: 50px; justify-content: center; text-align: center; padding: 5px">
                     <button class="unlike" style="font-size: 12px; margin: auto; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';"
                         onmouseout="this.style.backgroundColor='#f0d067';">Unlike</button>
                     </div>
                 </form>
             {% else %}
-                <form method="post" action="{% url 'likeunlikecomment' comment.id %}">
+                <form method="post" action="{% url 'likeunlikecomment' comment.id pageno %}">
                      {% csrf_token %}
-                    <div style="height: 50px; justify-content: center; text-align: center; padding: 20px">
-                    <button class="like" style="margin:auto; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                    <div style="margin-top: 3px; height: 50px; justify-content: center; text-align: center; padding: 5px">
+                    <button class="like" style="font-size: 12px; margin:auto; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                         onmouseover="this.style.backgroundColor='brown';"
                         onmouseout="this.style.backgroundColor='#f0d067';">Like</button>
                     </div>
@@ -88,6 +115,23 @@
         </div>
         </div>
     {% endfor %}
+    </div>
+    
+    <div style="justify-content: center; width: 100%;">
+    {% if pageno != 0 %}
+    <a href="{% url 'restaurantprevcomments' restaurant.id pageno %}">
+    <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
+                        onmouseover="this.style.backgroundColor='brown';" 
+                        onmouseout="this.style.backgroundColor='#f0d067';">Previous Page</button>
+    </a>
+    {% endif %}
+    {% if next_exists %}
+    <a href="{% url 'restaurantnextcomments' restaurant.id pageno %}">
+    <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; text-align: right; float: right;" 
+                        onmouseover="this.style.backgroundColor='brown';" 
+                        onmouseout="this.style.backgroundColor='#f0d067';">Next Page</button>
+    </a>
+    {% endif %}
     </div>
     
 {% endblock %}

@@ -6,10 +6,16 @@ from django.utils.timezone import now
 
 
 # Create your models here.
+
+class FavoritesList(models.Model):
+    def __str__(self):
+        return "FavoritesList for user"
+
+
 class User(AbstractUser):
     isOwner = models.BooleanField(default=False)
     name = models.CharField(max_length=100)
-
+    favorites = models.OneToOneField(FavoritesList, on_delete=models.SET_NULL, null=True, blank=True)
     # location = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -30,6 +36,7 @@ class Restaurant(models.Model):
     city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(upload_to='restaurant-images/', default='images/restaurant.jpg')
+    favorites = models.ManyToManyField(FavoritesList, related_name='favorites', blank=True, default=None)
     point = models.FloatField()
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)

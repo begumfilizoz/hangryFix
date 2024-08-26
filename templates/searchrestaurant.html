@@ -9,48 +9,50 @@
         <div class="form">
             <div class="col-md-12">
             </div>
-        {{ form.as_p }}
+            {{ form.as_p }}
         </div>
-        <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
-                        onmouseover="this.style.backgroundColor='brown';" 
-                        onmouseout="this.style.backgroundColor='#f0d067';">Search</button>
+        <button type="submit"
+                style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                onmouseover="this.style.backgroundColor='brown';"
+                onmouseout="this.style.backgroundColor='#f0d067';">Search
+        </button>
     </form>
     <script>
 
-       $('#id_city').select2();
-       $('#id_country').select2();
-       $('#id_city').prop('disabled', true).append($('<option>', {
+        $('#id_city').select2();
+        $('#id_country').select2();
+        $('#id_city').prop('disabled', true).append($('<option>', {
             value: "",
             text: "Select a country first",
             disabled: true,
             selected: true
         }));
-            $('#id_country').on('change', function () {
-                const countryId = $(this).val();
-                $.ajax({
-                    url: '{% url "getcitiesandcountries" %}',
-                    type: "GET",
-                    data: {
-                        'country_id': countryId
-                    },
-                    dataType: "json",
-                     success: function(data) {
-                        $('#id_city').empty();
-                         $('#id_city').prop('disabled', false).append($('<option>', {
-                                value: "",
-                                text: "Select a city",
-                                disabled: true,
-                                selected: true
-                            }));
-                        $.each(data, function(index, city) {
-                            $('#id_city').append($('<option>', {
-                                value: city.id,
-                                text: city.name 
-                            }));
-                        });
-                        $('#id_city').trigger('change');
-                    }
-                });
+        $('#id_country').on('change', function () {
+            const countryId = $(this).val();
+            $.ajax({
+                url: '{% url "getcitiesandcountries" %}',
+                type: "GET",
+                data: {
+                    'country_id': countryId
+                },
+                dataType: "json",
+                success: function (data) {
+                    $('#id_city').empty();
+                    $('#id_city').prop('disabled', false).append($('<option>', {
+                        value: "",
+                        text: "Select a city",
+                        disabled: true,
+                        selected: true
+                    }));
+                    $.each(data, function (index, city) {
+                        $('#id_city').append($('<option>', {
+                            value: city.id,
+                            text: city.name
+                        }));
+                    });
+                    $('#id_city').trigger('change');
+                }
             });
+        });
     </script>
 {% endblock %}

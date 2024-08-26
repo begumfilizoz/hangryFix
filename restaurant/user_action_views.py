@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.core.serializers import serialize
-from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine
+from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine, FavoritesList
 from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm, SearchRestaurantForm
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
@@ -21,6 +21,10 @@ class SignUpView(View):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            favorites_list = FavoritesList()
+            favorites_list.save()
+            user.favorites = favorites_list
+            user.save()
             auth_login(request, user)
             return redirect('search')
         return render(request, 'signup.html', {'form': form})
@@ -69,12 +73,40 @@ class DeleteCommentFromProfileView(View):
 
 class ProfileView(View):
     def get(self, request, id):
-        user = get_object_or_404(User, id=id)
-        restaurants = Restaurant.objects.filter(owner=user)
-        comments = Comment.objects.filter(user=user)
+        requested_user = get_object_or_404(User, id=id)
+        restaurants = Restaurant.objects.filter(owner=requested_user)
+        comments = Comment.objects.filter(user=requested_user)
         if not request.user.is_authenticated:
             return redirect('login')
-        return render(request, 'profile.html', {'user': user, 'restaurants': restaurants, 'comments': comments})
+        return render(request, 'profile.html',
+                      {'requested_user': requested_user, 'restaurants': restaurants, 'comments': comments, 'id': id})
+
+
+class AddToFavoritesView(View):
+    def post(self, request, id, pageno):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        list = request.user.favorites
+        restaurant.favorites.add(list)
+        restaurant.save()
+        return redirect('restaurantdetail', id=id, pageno=pageno)
+
+
+class RemoveFromFavoritesView(View):
+    def post(self, request, id, pageno):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        list = request.user.favorites
+        restaurant.favorites.remove(list)
+        restaurant.save()
+        return redirect('restaurantdetail', id=id, pageno=pageno)
+
+
+class RemoveFromFavoritesProfileView(View):
+    def post(self, request, id, page_no):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        list = request.user.favorites
+        restaurant.favorites.remove(list)
+        restaurant.save()
+        return redirect('favorites', id=request.user.id, page_no=page_no)
 
 
 class LogoutView(View):
@@ -96,3 +128,65 @@ class DeleteUserView(View):
         logout(request)
         user.delete()
         return redirect('login')
+
+
+class OtherProfileView(View):
+    def get(self, request, id):
+        other_user = get_object_or_404(User, id=id)
+        return render(request, 'otherprofile.html', {'other_user': other_user})
+
+
+class PrevFavoritesView(View):
+    def get(self, request, id, page_no):
+        requested_user = get_object_or_404(User, id=id)
+        favorites_list = request.user.favorites
+        next_exists = True
+        if favorites_list:
+            restaurants = Restaurant.objects.filter(favorites=favorites_list)
+        else:
+            restaurants = Restaurant.objects.none()
+        if page_no > 0:
+            page_no = page_no - 1
+            if (page_no + 1) * 5 > restaurants.count():
+                next_exists = False
+            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
+        return render(request, 'favorites.html',
+                      {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
+                       'page_no': page_no})
+
+
+class NextFavoritesView(View):
+    def get(self, request, id, page_no):
+        requested_user = get_object_or_404(User, id=id)
+        favorites_list = request.user.favorites
+        next_exists = True
+        if favorites_list:
+            restaurants = Restaurant.objects.filter(favorites=favorites_list)
+        else:
+            restaurants = Restaurant.objects.none()
+        if page_no != -1:
+            page_no = page_no + 1
+            if (page_no + 1) * 5 > restaurants.count():
+                next_exists = False
+            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
+        return render(request, 'favorites.html',
+                      {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
+                       'page_no': page_no})
+
+
+class FavoritesView(View):
+    def get(self, request, id, page_no):
+        requested_user = get_object_or_404(User, id=id)
+        favorites_list = request.user.favorites
+        next_exists = True
+        if favorites_list:
+            restaurants = Restaurant.objects.filter(favorites=favorites_list)
+        else:
+            restaurants = Restaurant.objects.none()
+        if page_no != -1:
+            if (page_no + 1) * 5 > restaurants.count():
+                next_exists = False
+            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
+        return render(request, 'favorites.html',
+                      {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
+                       'page_no': page_no})

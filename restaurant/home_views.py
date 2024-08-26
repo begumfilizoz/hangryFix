@@ -41,7 +41,7 @@ class RestrictedHomeView(View):
             if keywords['cuisine'] != -1:
                 cuisine_id = keywords['cuisine']
                 filters['cuisine'] = get_object_or_404(Cuisine, id=cuisine_id)
-            restaurants = Restaurant.objects.filter(**filters).order_by('point')
+            restaurants = Restaurant.objects.filter(**filters)
             if name_exists:
                 restaurants = restaurants.filter(name__icontains=name)
             print(filters)
@@ -86,7 +86,7 @@ class PrevPageView(View):
             if keywords['cuisine'] != -1:
                 cuisine_id = keywords['cuisine']
                 filters['cuisine'] = get_object_or_404(Cuisine, id=cuisine_id)
-            restaurants = Restaurant.objects.filter(**filters).order_by('point')
+            restaurants = Restaurant.objects.filter(**filters)
             if name_exists:
                 restaurants = restaurants.filter(name__icontains=name)
             print(filters)
@@ -133,7 +133,7 @@ class NextPageView(View):
             if keywords['cuisine'] != -1:
                 cuisine_id = keywords['cuisine']
                 filters['cuisine'] = get_object_or_404(Cuisine, id=cuisine_id)
-            restaurants = Restaurant.objects.filter(**filters).order_by('point')
+            restaurants = Restaurant.objects.filter(**filters)
             if name_exists:
                 restaurants = restaurants.filter(name__icontains=name)
             print(filters)

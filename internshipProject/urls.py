@@ -18,8 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from restaurant.home_views import (HomeView, RestrictedHomeView, SearchView, NextPageView, PrevPageView)
 from restaurant.restaurant_views import (AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
-                              DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView, BookingView)
-from restaurant.user_action_views import (SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView)
+                              DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView, BookingView, NextRestaurantDetailView, PrevRestaurantDetailView)
+from restaurant.user_action_views import (PrevFavoritesView, NextFavoritesView, RemoveFromFavoritesProfileView, AddToFavoritesView, RemoveFromFavoritesView, SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView, OtherProfileView, FavoritesView)
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -35,10 +35,13 @@ urlpatterns = [
     path('login/', LogInView.as_view(), name='login'),
     path('contact/', ContactView.as_view(), name='contact'),
     path('addrestaurant/', AddRestaurantView.as_view(), name='addrestaurant'),
-    path('restaurant/<int:id>/', RestaurantDetailView.as_view(), name='restaurantdetail'),
+    path('restaurant/<int:id>/<int:pageno>/', RestaurantDetailView.as_view(), name='restaurantdetail'),
+    path('restaurantnextcomments/<int:id>/<int:pageno>/', NextRestaurantDetailView.as_view(), name='restaurantnextcomments'),
+    path('restaurantprevcomments/<int:id>/<int:pageno>/', PrevRestaurantDetailView.as_view(), name='restaurantprevcomments'),
     path('bookatable/<int:id>/', BookingView.as_view(), name='bookatable'),
     path('menu/<int:id>/', MenuView.as_view(), name='menu'),
     path('profile/<int:id>/', ProfileView.as_view(), name='profile'),
+    path('otherprofile/<int:id>/', OtherProfileView.as_view(), name='otherprofile'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('addmeal/<int:id>/', AddMealView.as_view(), name='addmeal'),
     path('removemeals/<int:id>/', RemoveMealsView.as_view(), name='removemeals'),
@@ -51,5 +54,11 @@ urlpatterns = [
     path('deleteuser/', DeleteUserView.as_view(), name='deleteuser'),
     path('makeuseranowner/', MakeUserOwnerView.as_view(), name='makeuserowner'),
     path('getcitiesandcountries/', GetCitiesAndCountriesView.as_view(), name='getcitiesandcountries'),
-    path('likeunlikecomment/<int:id>/', LikeUnlikeReviewView.as_view(), name='likeunlikecomment'),
+    path('likeunlikecomment/<int:id>/<int:pageno>/', LikeUnlikeReviewView.as_view(), name='likeunlikecomment'),
+    path('addtofavorites/<int:id>/<int:pageno>/', AddToFavoritesView.as_view(), name='addtofavorites'),
+    path('removefromfavorites/<int:id>/<int:pageno>/', RemoveFromFavoritesView.as_view(), name='removefromfavorites'),
+    path('favorites/<int:id>/<int:page_no>/', FavoritesView.as_view(), name='favorites'),
+    path('removefromfavoritesprofile/<int:id>/<int:page_no>/', RemoveFromFavoritesProfileView.as_view(), name='removefromfavoritesprofile'),
+    path('nextfavorites/<int:id>/<int:page_no>/', NextFavoritesView.as_view(), name='nextfavorites'),
+    path('prevfavorites/<int:id>/<int:page_no>/', PrevFavoritesView.as_view(), name='prevfavorites'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
