@@ -1,34 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Your Favorites{% endblock %}
+{% block title %}{{ requested_user.name }}'s Favorites{% endblock %}
 
 {% block content %}
-    {% if requested_user == user %}
-        <h2>Your Favorites</h2>
-        <a href="{% url 'profile' user.id %}">
+    {% if not requested_user.favorites_is_private %}
+        <h2>{{ requested_user.name }}'s Favorites</h2>
+        <a href="{% url 'otherprofile' requested_user.id %}">
                         <button style=" background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                                 onmouseover="this.style.backgroundColor='brown';"
                                 onmouseout="this.style.backgroundColor='#f0d067';">Return To Profile</button>
                         </a>
-        {% if user.favorites_is_private %}
-            <form method="post" action="{% url 'make-public' %}">
-                {% csrf_token %}
-                <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
-                                onmouseover="this.style.backgroundColor='brown';"
-                                onmouseout="this.style.backgroundColor='#f0d067';">Make Your Favorites Public</button>
-            </form>
-        {% else %}
-            <form method="post" action="{% url 'make-private' %}">
-                {% csrf_token %}
-                <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
-                                onmouseover="this.style.backgroundColor='brown';"
-                                onmouseout="this.style.backgroundColor='#f0d067';">Make Your Favorites Private</button>
-            </form>
-        {% endif %}
         <div class="column">
-            <p>{{ count }} favorites</p>
+        <p>{{ count }} favorites</p>
             {% for restaurant in restaurants %}
-                <div>
+                
                 <div class="row">
                     <div class="restaurant-image"><img src="{{ restaurant.image.url }}"></div>
                     <div class="restaurant-info">
@@ -50,26 +35,19 @@
                     </div>
 
                 </div>
-                <form method="post" action="{% url 'removefromfavoritesprofile' restaurant.id page_no %}" style="text-align: right">
-                            {% csrf_token %}
-                            <button class="submit" style="margin-right: 50px; margin-top: 10px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
-                                    onmouseover="this.style.backgroundColor='brown';"
-                                    onmouseout="this.style.backgroundColor='#f0d067';">
-                                Remove From Favorites</button>
-                        </form>
-                </div>
+               
             {% endfor %}
         </div>
         <div style="justify-content: center; width: 100%;">
             {% if page_no != 0 %}
-            <a href="{% url 'prevfavorites' user.id page_no %}">
+            <a href="{% url 'other-prevfavorites' requested_user.id page_no %}">
             <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                                 onmouseover="this.style.backgroundColor='brown';" 
                                 onmouseout="this.style.backgroundColor='#f0d067';">Previous Page</button>
             </a>
             {% endif %}
             {% if next_exists %}
-            <a href="{% url 'nextfavorites' user.id page_no %}">
+            <a href="{% url 'other-nextfavorites' requested_user.id page_no %}">
             <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; text-align: right; float: right;" 
                                 onmouseover="this.style.backgroundColor='brown';" 
                                 onmouseout="this.style.backgroundColor='#f0d067';">Next Page</button>

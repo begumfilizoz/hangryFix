@@ -2,7 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.core.serializers import serialize
-from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine, FavoritesList
+from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine, FavoritesList, ThirtyMinuteBookingSlot, TwoHourBookingSlot, Booking
 from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm, SearchRestaurantForm, BookingForm
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from cities_light.models import City, Country
 from django.contrib import messages
 import folium
+from datetime import datetime, timedelta
 
 
 class AddRestaurantView(View):
@@ -329,18 +330,150 @@ class RemoveRestaurantView(View):
 class BookingView(View):
     def get(self, request, id):
         restaurant = get_object_or_404(Restaurant, id=id)
-        form = BookingForm(restaurant=restaurant)
+        form = BookingForm()
         return render(request, 'bookrestaurant.html', {"restaurant": restaurant, "form": form})
 
     def post(self, request, id):
         restaurant = get_object_or_404(Restaurant, id=id)
-        form = BookingForm(request.POST, restaurant=restaurant)
-
+        form = BookingForm(request.POST)
         if form.is_valid():
-            booking = form.save(commit=False)
-            booking.restaurant = restaurant
-            booking.user = request.user
-            booking.save()
-            messages.success(request, 'You successfully booked the restaurant.')
-            return redirect('restaurantdetail', id=restaurant.id, pageno=0)
+            if form.cleaned_data['date'] is not None and form.cleaned_data['number_of_people'] is not None:
+                date = form.cleaned_data.get('date')
+                number_of_people = form.cleaned_data.get('number_of_people')
+                start_time = datetime.combine(date, restaurant.start_time)
+                end_time = datetime.combine(date, restaurant.end_time)
+                start_time = start_time.replace(minute=0, second=0, microsecond=0)
+                end_time = end_time.replace(minute=0, second=0, microsecond=0)
+                slots = []
+                current_time = start_time
+                while current_time < end_time:
+                    slots.append(current_time)
+                    current_time = current_time + timedelta(minutes=30)
+                available_slots = []
+                for slot in slots:
+                    booking = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=slot.time(), date=date).first()
+                    if booking is not None and booking.free_tables > 0:
+                        available_slots.append(slot)
+                    elif booking is None:
+                        available_slots.append(slot)
+                print(available_slots)
+                two_hour_booking_slots = []
+                for slot in available_slots:
+                    slot2 = slot + timedelta(minutes=30)
+                    slot3 = slot2 + timedelta(minutes=30)
+                    slot4 = slot3 + timedelta(minutes=30)
+                    if slot2 in available_slots and slot3 in available_slots and slot4 in available_slots:
+                        two_hour_slot = TwoHourBookingSlot(restaurant=restaurant, start_time=slot.time(), end_time=(slot4 + timedelta(minutes=30)).time(), date=date)
+                        two_hour_slot.save()
+                        two_hour_booking_slots.append(two_hour_slot)
+            return render(request, 'slotpick.html', {"date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
         return render(request, 'bookrestaurant.html', {"restaurant": restaurant, "form": form})
+
+
+class PickSlotView(View):
+    def post(self, request, rest_id, slot_id, number):
+        restaurant = get_object_or_404(Restaurant, id=rest_id)
+        slot = get_object_or_404(TwoHourBookingSlot, id=slot_id)
+        booking = Booking(restaurant=restaurant, user=request.user, date=slot.date, start_time=slot.start_time, end_time=slot.end_time, number_of_people=number)
+        booking.save()
+        start_time = datetime.combine(slot.date, slot.start_time)
+        start_time1 = start_time + timedelta(minutes=30)
+        start_time2 = start_time1 + timedelta(minutes=30)
+        start_time3 = start_time2 + timedelta(minutes=30)
+        slot1 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time.time(), date=slot.date).first()
+        if slot1 is None:
+            slot1 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time.time(), date=slot.date)
+        slot2 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time1.time(), date=slot.date).first()
+        if slot2 is None:
+            slot2 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time1.time(), date=slot.date)
+        slot3 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time2.time(), date=slot.date).first()
+        if slot3 is None:
+            slot3 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time2.time(), date=slot.date)
+        slot4 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time3.time(), date=slot.date).first()
+        if slot4 is None:
+            slot4 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time3.time(), date=slot.date)
+        slot1.occupied_tables += 1
+        slot2.occupied_tables += 1
+        slot3.occupied_tables += 1
+        slot4.occupied_tables += 1
+        slot1.free_tables -= 1
+        slot2.free_tables -= 1
+        slot3.free_tables -= 1
+        slot4.free_tables -= 1
+        slot1.save()
+        slot2.save()
+        slot3.save()
+        slot4.save()
+        messages.success(request, "Booking completed successfully.")
+        return redirect('restaurantdetail', id=restaurant.id, pageno=0)
+
+
+class BookNextDay(View):
+    def post(self, request, id, date, number):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        next_date = datetime.strptime(date, "%Y-%m-%d").date()
+        date = next_date + timedelta(days=1)
+        number_of_people = number
+        start_time = datetime.combine(date, restaurant.start_time)
+        end_time = datetime.combine(date, restaurant.end_time)
+        start_time = start_time.replace(minute=0, second=0, microsecond=0)
+        end_time = end_time.replace(minute=0, second=0, microsecond=0)
+        slots = []
+        current_time = start_time
+        while current_time < end_time:
+            slots.append(current_time)
+            current_time = current_time + timedelta(minutes=30)
+        available_slots = []
+        for slot in slots:
+            booking = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=slot.time(), date=date).first()
+            if booking is not None and booking.free_tables > 0:
+                available_slots.append(slot)
+            elif booking is None:
+                available_slots.append(slot)
+        print(available_slots)
+        two_hour_booking_slots = []
+        for slot in available_slots:
+            slot2 = slot + timedelta(minutes=30)
+            slot3 = slot2 + timedelta(minutes=30)
+            slot4 = slot3 + timedelta(minutes=30)
+            if slot2 in available_slots and slot3 in available_slots and slot4 in available_slots:
+                two_hour_slot = TwoHourBookingSlot(restaurant=restaurant, start_time=slot.time(), end_time=(slot4 + timedelta(minutes=30)).time(), date=date)
+                two_hour_slot.save()
+                two_hour_booking_slots.append(two_hour_slot)
+        return render(request, 'slotpick.html', {"date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
+
+
+class BookPrevDay(View):
+    def post(self, request, id, date, number):
+        restaurant = get_object_or_404(Restaurant, id=id)
+        next_date = datetime.strptime(date, "%Y-%m-%d").date()
+        date = next_date - timedelta(days=1)
+        number_of_people = number
+        start_time = datetime.combine(date, restaurant.start_time)
+        end_time = datetime.combine(date, restaurant.end_time)
+        start_time = start_time.replace(minute=0, second=0, microsecond=0)
+        end_time = end_time.replace(minute=0, second=0, microsecond=0)
+        slots = []
+        current_time = start_time
+        while current_time < end_time:
+            slots.append(current_time)
+            current_time = current_time + timedelta(minutes=30)
+        available_slots = []
+        for slot in slots:
+            booking = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=slot.time(), date=date).first()
+            if booking is not None and booking.free_tables > 0:
+                available_slots.append(slot)
+            elif booking is None:
+                available_slots.append(slot)
+        print(available_slots)
+        two_hour_booking_slots = []
+        for slot in available_slots:
+            slot2 = slot + timedelta(minutes=30)
+            slot3 = slot2 + timedelta(minutes=30)
+            slot4 = slot3 + timedelta(minutes=30)
+            if slot2 in available_slots and slot3 in available_slots and slot4 in available_slots:
+                two_hour_slot = TwoHourBookingSlot(restaurant=restaurant, start_time=slot.time(), end_time=(slot4 + timedelta(minutes=30)).time(), date=date)
+                two_hour_slot.save()
+                two_hour_booking_slots.append(two_hour_slot)
+        return render(request, 'slotpick.html', {"date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
+

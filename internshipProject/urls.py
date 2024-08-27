@@ -17,9 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from restaurant.home_views import (HomeView, RestrictedHomeView, SearchView, NextPageView, PrevPageView)
-from restaurant.restaurant_views import (AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
+from restaurant.restaurant_views import (BookNextDay, BookPrevDay, PickSlotView, AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
                               DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView, BookingView, NextRestaurantDetailView, PrevRestaurantDetailView)
-from restaurant.user_action_views import (PrevFavoritesView, NextFavoritesView, RemoveFromFavoritesProfileView, AddToFavoritesView, RemoveFromFavoritesView, SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView, OtherProfileView, FavoritesView)
+from restaurant.user_action_views import (OtherFavoritesView, OtherNextFavoritesView, OtherPrevFavoritesView, MakeFavoritesPublicView, MakeFavoritesPrivateView, PrevFavoritesView, NextFavoritesView, RemoveFromFavoritesProfileView, AddToFavoritesView, RemoveFromFavoritesView, SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView, OtherProfileView, FavoritesView)
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -61,4 +61,12 @@ urlpatterns = [
     path('removefromfavoritesprofile/<int:id>/<int:page_no>/', RemoveFromFavoritesProfileView.as_view(), name='removefromfavoritesprofile'),
     path('nextfavorites/<int:id>/<int:page_no>/', NextFavoritesView.as_view(), name='nextfavorites'),
     path('prevfavorites/<int:id>/<int:page_no>/', PrevFavoritesView.as_view(), name='prevfavorites'),
+    path('make-public/', MakeFavoritesPublicView.as_view(), name='make-public'),
+    path('make-private/', MakeFavoritesPrivateView.as_view(), name='make-private'),
+    path('other-favorites/<int:id>/<int:page_no>/', OtherFavoritesView.as_view(), name='other-favorites'),
+    path('other-nextfavorites/<int:id>/<int:page_no>/', OtherNextFavoritesView.as_view(), name='other-nextfavorites'),
+    path('other-prevfavorites/<int:id>/<int:page_no>/', OtherPrevFavoritesView.as_view(), name='other-prevfavorites'),
+    path('pick-the-slot/<int:rest_id>/<int:slot_id>/<int:number>/', PickSlotView.as_view(), name='pick-the-slot'),
+    path('book-next-day/<int:id>/<str:date>/<int:number>/', BookNextDay.as_view(), name='book-next-day'),
+    path('book-prev-day/<int:id>/<str:date>/<int:number>/', BookPrevDay.as_view(), name='book-prev-day'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

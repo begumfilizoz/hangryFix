@@ -48,6 +48,7 @@ class RestrictedHomeView(View):
         if pageno != -1:
             if (pageno + 1) * 5 > restaurants.count():
                 next_exists = False
+            restaurants.order_by('id')
             restaurants = restaurants[pageno * 5:pageno * 5 + 5]
         context = {
             'restaurants': restaurants,
@@ -94,6 +95,7 @@ class PrevPageView(View):
             pageno = pageno - 1
             if (pageno + 1) * 5 > restaurants.count():
                 next_exists = False
+            restaurants.order_by('id')
             restaurants = restaurants[pageno * 5:pageno * 5 + 5]
         context = {
             'restaurants': restaurants,
@@ -141,6 +143,7 @@ class NextPageView(View):
             pageno = pageno + 1
             if (pageno + 1) * 5 > restaurants.count():
                 next_exists = False
+            restaurants.order_by('id')
             restaurants = restaurants[pageno * 5:pageno * 5 + 5]
         context = {
             'restaurants': restaurants,

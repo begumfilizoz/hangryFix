@@ -20,6 +20,11 @@ class UserCreationForm(UserCreationForm):
         fields = ['username', 'email', 'name', 'isOwner', 'password1', 'password2']
 
 
+class TimeInput(forms.TimeInput):
+    input_type = 'time'
+    format = '%H:%M'
+
+
 class AddRestaurantForm(forms.ModelForm):
     image = forms.ImageField(required=False)
     cuisine = forms.ModelChoiceField(queryset=Cuisine.objects.all(), required=True)
@@ -28,10 +33,17 @@ class AddRestaurantForm(forms.ModelForm):
     name = forms.CharField(required=True)
     lat = forms.FloatField(required=True)
     lng = forms.FloatField(required=True)
+    tables = forms.IntegerField(required=True, label='Number of tables')
+    start_time = forms.TimeField(required=True, label='Opening Time')
+    end_time = forms.TimeField(required=True, label='Closing Time')
 
     class Meta:
         model = Restaurant
-        fields = ['name', 'country', 'city', 'cuisine', 'image', 'lat', 'lng']
+        fields = ['name', 'country', 'city', 'cuisine', 'image', 'lat', 'lng', 'start_time', 'end_time']
+        widgets = {
+            'start_time': TimeInput(format='%H:%M'),
+            'end_time': TimeInput(format='%H:%M'),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -64,25 +76,10 @@ class ContactForm(forms.ModelForm):
         fields = ['name', 'email', 'message']
 
 
-class BookingForm(forms.ModelForm):
-    class Meta:
-        model = Booking
-        date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
-        fields = ['date', 'time']
-        widgets = {
-            'date': forms.widgets.DateInput(attrs={'type': 'date'})
-        }
-
-    def __init__(self, *args, **kwargs):
-        self.restaurant = kwargs.pop('restaurant', None)
-        super().__init__(*args, **kwargs)
-
-    def clean(self):
-        cleaned_data = super().clean()
-        date = cleaned_data.get('date')
-        time = cleaned_data.get('time')
-
-        if self.restaurant and date and time:
-            if Booking.objects.filter(restaurant=self.restaurant, date=date).exists():
-                raise forms.ValidationError("You already booked this restaurant at the selected date.")
-        return cleaned_data
+class BookingForm(forms.Form):
+    date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    number_of_people = forms.IntegerField(min_value=1, widget=forms.widgets.NumberInput(attrs={'type': 'number'}))
+    fields = ['date', 'number_of_people']
+    widgets = {
+        'date': forms.widgets.DateInput(attrs={'type': 'date'})
+    }

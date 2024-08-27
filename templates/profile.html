@@ -25,7 +25,7 @@
                     </a>
         <h2><br>Your Reviews:</h2>
         {% for comment in comments %}
-            <li style="border: solid; border-color: brown;">For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
+            <li style="border-radius: 10px; background-color: rgb(138, 117, 98, 0.8); border: solid; border-color: brown; padding: 5px; margin-top: 5px; background-color: ">For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
                 {% if comment.comment %}
                     and this review: {{ comment.comment }} <br>
                 {% endif %}
@@ -57,7 +57,7 @@
             </a>
             <p></p>
             {% for restaurant in restaurants %}
-                <li style="border: solid; border-color: brown;">
+                <li style="background-color: rgb(138, 117, 98, 0.8); border-radius: 10px; border: solid; border-color: brown; padding: 5px; margin-top: 5px;">
                     {{ restaurant.name }} - {{ restaurant.city }} - {{ restaurant.cuisine }} - {{ restaurant.find_rating|floatformat:1 }}
                     <a href="{% url 'restaurantdetail' restaurant.id 0 %}">
                     <button style="font-size: 12px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"

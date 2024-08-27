@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Avg
 from cities_light.models import City, Country
+import datetime
 from django.utils.timezone import now
 
 
@@ -16,6 +17,7 @@ class User(AbstractUser):
     isOwner = models.BooleanField(default=False)
     name = models.CharField(max_length=100)
     favorites = models.OneToOneField(FavoritesList, on_delete=models.SET_NULL, null=True, blank=True)
+    favorites_is_private = models.BooleanField(default=False)
     # location = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
@@ -40,6 +42,9 @@ class Restaurant(models.Model):
     point = models.FloatField()
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
+    tables = models.IntegerField(default=5)
+    start_time = models.TimeField(default=datetime.time(9, 0))
+    end_time = models.TimeField(default=datetime.time(21, 0))
 
     def __str__(self):
         return self.name
@@ -92,10 +97,24 @@ class Booking(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateField(default=now)
-    time = models.TimeField(default=now)
-
-    class Meta:
-        unique_together = ('restaurant', 'user', 'date')
+    start_time = models.TimeField(default=datetime.time(9, 0))
+    end_time = models.TimeField(default=datetime.time(11, 0))
+    number_of_people = models.IntegerField(default=2)
 
     def __str__(self):
         return self.restaurant.name
+
+
+class ThirtyMinuteBookingSlot(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    start_time = models.TimeField(default=datetime.time(9, 0))
+    date = models.DateField(default=now)
+    free_tables = models.IntegerField(default=5)
+    occupied_tables = models.IntegerField(default=0)
+
+
+class TwoHourBookingSlot(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    start_time = models.TimeField(default=datetime.time(9, 0))
+    end_time = models.TimeField(default=datetime.time(11, 0))
+    date = models.DateField(default=now)
