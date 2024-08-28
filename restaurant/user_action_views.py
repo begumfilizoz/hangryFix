@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.core.serializers import serialize
-from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine, FavoritesList
+from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine, FavoritesList, Booking, ThirtyMinuteBookingSlot
 from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm, SearchRestaurantForm
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
@@ -9,7 +9,9 @@ from django.db.models import Avg
 from django.http import JsonResponse
 from cities_light.models import City, Country
 from django.contrib import messages
-import folium
+import folium, math
+from django.utils import timezone
+from datetime import datetime, timedelta
 
 
 class SignUpView(View):
@@ -276,3 +278,51 @@ class OtherFavoritesView(View):
         return render(request, 'other-favorites.html',
                       {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
                        'page_no': page_no, 'count': count})
+
+
+class BookingsView(View):
+    def get(self, request):
+        bookings = Booking.objects.filter(user=request.user).order_by('id')
+        for booking in bookings:
+            if booking.date < timezone.now().date():
+                booking.delete()
+        bookings.order_by('id')
+        count = bookings.count()
+        return render(request, 'userbookings.html', {'count': count, 'bookings': bookings})
+
+
+class RestaurantsListView(View):
+    def get(self, request):
+        restaurants = Restaurant.objects.filter(owner=request.user).order_by('id')
+        return render(request, 'restaurantlist.html', {'restaurants': restaurants})
+
+
+class ManageBookingsRestaurantView(View):
+    def get(self, request, id):
+        restaurant = Restaurant.objects.get(id=id)
+        requested_user = request.user
+        bookings = Booking.objects.filter(restaurant=restaurant).order_by('id')
+        for booking in bookings:
+            if booking.date < timezone.now().date():
+                booking.delete()
+        bookings.order_by('id')
+        count = bookings.count()
+        return render(request, 'bookingslist.html', {'count': count, 'restaurant': restaurant, 'bookings': bookings, 'requested_user': requested_user})
+
+
+class ApproveBookingView(View):
+    def post(self, request, id):
+        booking = Booking.objects.get(id=id)
+        booking.approved = True
+        booking.save()
+        messages.success(request, 'Booking approved')
+        restaurant = booking.restaurant
+        requested_user = request.user
+        bookings = Booking.objects.filter(restaurant=restaurant).order_by('id')
+        for booking in bookings:
+            if booking.date < timezone.now().date():
+                booking.delete()
+        bookings.order_by('id')
+        count = bookings.count()
+        return render(request, 'bookingslist.html',
+                      {'count': count, 'restaurant': restaurant, 'bookings': bookings, 'requested_user': requested_user})

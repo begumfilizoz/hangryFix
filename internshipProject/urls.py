@@ -17,9 +17,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from restaurant.home_views import (HomeView, RestrictedHomeView, SearchView, NextPageView, PrevPageView)
-from restaurant.restaurant_views import (BookNextDay, BookPrevDay, PickSlotView, AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
+from restaurant.restaurant_views import (DeleteBookingOwnerView, DeleteBookingView, BookNextDay, BookPrevDay, PickSlotView, AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
                               DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView, BookingView, NextRestaurantDetailView, PrevRestaurantDetailView)
-from restaurant.user_action_views import (OtherFavoritesView, OtherNextFavoritesView, OtherPrevFavoritesView, MakeFavoritesPublicView, MakeFavoritesPrivateView, PrevFavoritesView, NextFavoritesView, RemoveFromFavoritesProfileView, AddToFavoritesView, RemoveFromFavoritesView, SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView, OtherProfileView, FavoritesView)
+from restaurant.user_action_views import (ApproveBookingView, ManageBookingsRestaurantView, RestaurantsListView, BookingsView,OtherFavoritesView, OtherNextFavoritesView, OtherPrevFavoritesView, MakeFavoritesPublicView, MakeFavoritesPrivateView, PrevFavoritesView, NextFavoritesView, RemoveFromFavoritesProfileView, AddToFavoritesView, RemoveFromFavoritesView, SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView, OtherProfileView, FavoritesView)
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -69,4 +69,10 @@ urlpatterns = [
     path('pick-the-slot/<int:rest_id>/<int:slot_id>/<int:number>/', PickSlotView.as_view(), name='pick-the-slot'),
     path('book-next-day/<int:id>/<str:date>/<int:number>/', BookNextDay.as_view(), name='book-next-day'),
     path('book-prev-day/<int:id>/<str:date>/<int:number>/', BookPrevDay.as_view(), name='book-prev-day'),
+    path('your-bookings/', BookingsView.as_view(), name='your-bookings'),
+    path('delete-booking/<int:id>/', DeleteBookingView.as_view(), name='delete-booking'),
+    path('delete-booking-owner/<int:id>/', DeleteBookingOwnerView.as_view(), name='delete-booking-owner'),
+    path('restaurant-list-bookings/', RestaurantsListView.as_view(), name='restaurant-list-bookings'),
+    path('manage-bookings/<int:id>/', ManageBookingsRestaurantView.as_view(), name='manage-bookings'),
+    path('approve-booking/<int:id>/', ApproveBookingView.as_view(), name='approve-booking'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

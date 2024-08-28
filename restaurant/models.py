@@ -43,6 +43,7 @@ class Restaurant(models.Model):
     lat = models.FloatField(default=0)
     lng = models.FloatField(default=0)
     tables = models.IntegerField(default=5)
+    people_per_table = models.IntegerField(default=4)
     start_time = models.TimeField(default=datetime.time(9, 0))
     end_time = models.TimeField(default=datetime.time(21, 0))
 
@@ -100,6 +101,7 @@ class Booking(models.Model):
     start_time = models.TimeField(default=datetime.time(9, 0))
     end_time = models.TimeField(default=datetime.time(11, 0))
     number_of_people = models.IntegerField(default=2)
+    approved = models.BooleanField(default=False)
 
     def __str__(self):
         return self.restaurant.name

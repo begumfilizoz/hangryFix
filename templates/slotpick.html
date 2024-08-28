@@ -3,32 +3,40 @@
 {% block title %}Pick a Slot{% endblock %}
 {% block content %}
     <h1>Pick a Slot to Book a Table at {{ restaurant.name }}</h1>
-    <div style="justify-content: space-evenly; width: 100%;">
-    <span style="width: 200px">
-        <form style="display: inline; width: 200px" method="post" action="{% url 'book-prev-day' restaurant.id date number_of_people %}">
-            {% csrf_token %}
-            <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
-                                onmouseover="this.style.backgroundColor='brown';"
-                                onmouseout="this.style.backgroundColor='#f0d067';">Previous Page</button>
-        </form>
-    </span>
-    <span style="width: 200px">
-        <form style="display: inline; width: 200px" method="post" action="{% url 'book-next-day' restaurant.id date number_of_people %}">
-            {% csrf_token %}
-            <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; text-align: right; float: right;"
-                                onmouseover="this.style.backgroundColor='brown';"
-                                onmouseout="this.style.backgroundColor='#f0d067';">Next Page</button>
-        </form>
-    </span>
-    </div>
-    <div class="column">
-            {% for slot in two_hour_booking_slots %}
-                <form method="post" action="{% url 'pick-the-slot' restaurant.id slot.id number_of_people %}">
-                    {% csrf_token %}
-                    <button type="submit" class="slots" style="width: 100%; height: 80px !important; margin-top: 10px; padding: 10px; padding-top: 10px; background-color: rgb(138, 117, 98, 0.8); border-radius: 20px; display:flex; flex-wrap: nowrap; justify-content: center; overflow: auto;">
-                        <h4>{{ slot.start_time }}-{{ slot.end_time }}</h4>
-                    </button>
-                </form>
-            {% endfor %}
-    </div>
+    <h3 style="color: #4d403f">Date: {{ date }}</h3>
+    {% if page_valid %}
+        <p>There are {{ count }} slots on the chosen date, for the number of people you have indicated. Select one to proceed with your booking request. Check your profile regularly for updates on your request.</p>
+        <div style="justify-content: space-evenly; width: 100%;">
+        {% if prev_exists %}
+        <span style="width: 200px">
+            <form style="display: inline; width: 200px" method="post" action="{% url 'book-prev-day' restaurant.id date number_of_people %}">
+                {% csrf_token %}
+                <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                                    onmouseover="this.style.backgroundColor='brown';"
+                                    onmouseout="this.style.backgroundColor='#f0d067';">Previous Day</button>
+            </form>
+        </span>
+        {% endif %}
+        <span style="width: 200px">
+            <form style="display: inline; width: 200px" method="post" action="{% url 'book-next-day' restaurant.id date number_of_people %}">
+                {% csrf_token %}
+                <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; text-align: right; float: right;"
+                                    onmouseover="this.style.backgroundColor='brown';"
+                                    onmouseout="this.style.backgroundColor='#f0d067';">Next Day</button>
+            </form>
+        </span>
+        </div>
+        <div class="column">
+                {% for slot in two_hour_booking_slots %}
+                    <form method="post" action="{% url 'pick-the-slot' restaurant.id slot.id number_of_people %}">
+                        {% csrf_token %}
+                        <button type="submit" class="slots" style="width: 100%; height: 80px !important; margin-top: 10px; padding: 10px; padding-top: 10px; background-color: rgb(138, 117, 98, 0.8); border-radius: 20px; display:flex; flex-wrap: nowrap; justify-content: center; overflow: auto;">
+                            <h4>{{ slot.start_time }} - {{ slot.end_time }}</h4>
+                        </button>
+                    </form>
+                {% endfor %}
+        </div>
+    {% else %}
+        <p>This date is not valid for bookings.</p>
+    {% endif %}
 {% endblock %}

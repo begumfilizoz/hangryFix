@@ -6,13 +6,14 @@
         <h2>{{ user.name }}</h2>
         <p>Username: {{ user.username }}</p>
         <p>E-mail: {{ user.email }}</p>
-        <form method="post" action="{% url 'logout' %}">
+        <div>
+        <form style="display: inline;" method="post" action="{% url 'logout' %}">
             {% csrf_token %}
             <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                             onmouseover="this.style.backgroundColor='brown';"
                             onmouseout="this.style.backgroundColor='#f0d067';">Log Out</button>
         </form>
-        <form method="post" action="{% url 'deleteuser' %}">
+        <form style="display: inline;" method="post" action="{% url 'deleteuser' %}">
             {% csrf_token %}
             <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                             onmouseover="this.style.backgroundColor='brown';"
@@ -23,9 +24,20 @@
                             onmouseover="this.style.backgroundColor='brown';"
                             onmouseout="this.style.backgroundColor='#f0d067';">Your Favorites</button>
                     </a>
+        <a href="{% url 'your-bookings' %}">
+                    <button style=" background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                            onmouseover="this.style.backgroundColor='brown';"
+                            onmouseout="this.style.backgroundColor='#f0d067';">Your Booking Requests</button>
+                    </a>
+        <a href="{% url 'restaurant-list-bookings' %}">
+                    <button style=" background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                            onmouseover="this.style.backgroundColor='brown';"
+                            onmouseout="this.style.backgroundColor='#f0d067';">Booking Requests To Your Restaurants</button>
+                    </a>
+        </div>
         <h2><br>Your Reviews:</h2>
         {% for comment in comments %}
-            <li style="border-radius: 10px; background-color: rgb(138, 117, 98, 0.8); border: solid; border-color: brown; padding: 5px; margin-top: 5px; background-color: ">For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
+            <li style="border-radius: 10px; background-color: rgb(138, 117, 98, 0.8); border: solid; border-color: brown; padding: 5px; margin-top: 5px; ">For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
                 {% if comment.comment %}
                     and this review: {{ comment.comment }} <br>
                 {% endif %}

@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from restaurant.models import User, Restaurant, Food, Comment, ContactMessage, Cuisine, Booking
 from django.core.validators import MaxValueValidator, MinValueValidator
 from cities_light.models import City, Country
+from django.utils import timezone
 
 
 class SearchRestaurantForm(forms.Form):
@@ -77,9 +78,16 @@ class ContactForm(forms.ModelForm):
 
 
 class BookingForm(forms.Form):
-    date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+    date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), error_messages={'invalid': 'Please enter a date after today.'}
+    )
     number_of_people = forms.IntegerField(min_value=1, widget=forms.widgets.NumberInput(attrs={'type': 'number'}))
     fields = ['date', 'number_of_people']
     widgets = {
         'date': forms.widgets.DateInput(attrs={'type': 'date'})
     }
+
+    def clean_date(self):
+        selected_date = self.cleaned_data['date']
+        if selected_date < timezone.now().date():
+            raise forms.ValidationError("The date must be today or after today.")
+        return selected_date

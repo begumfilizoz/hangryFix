@@ -12,6 +12,8 @@ from cities_light.models import City, Country
 from django.contrib import messages
 import folium
 from datetime import datetime, timedelta
+import math
+from django.utils import timezone
 
 
 class AddRestaurantView(View):
@@ -339,6 +341,13 @@ class BookingView(View):
         if form.is_valid():
             if form.cleaned_data['date'] is not None and form.cleaned_data['number_of_people'] is not None:
                 date = form.cleaned_data.get('date')
+                page_valid = True
+                if date < timezone.now().date():
+                    page_valid = False
+                prev_date = date - timedelta(days=1)
+                prev_exists = True
+                if prev_date < timezone.now().date():
+                    prev_exists = False
                 number_of_people = form.cleaned_data.get('number_of_people')
                 start_time = datetime.combine(date, restaurant.start_time)
                 end_time = datetime.combine(date, restaurant.end_time)
@@ -352,10 +361,13 @@ class BookingView(View):
                 available_slots = []
                 for slot in slots:
                     booking = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=slot.time(), date=date).first()
+                    number_of_tables_required = math.ceil(number_of_people / restaurant.people_per_table)
                     if booking is not None and booking.free_tables > 0:
-                        available_slots.append(slot)
+                        if booking.free_tables >= number_of_tables_required:
+                            available_slots.append(slot)
                     elif booking is None:
-                        available_slots.append(slot)
+                        if restaurant.tables >= number_of_tables_required:
+                            available_slots.append(slot)
                 print(available_slots)
                 two_hour_booking_slots = []
                 for slot in available_slots:
@@ -366,7 +378,8 @@ class BookingView(View):
                         two_hour_slot = TwoHourBookingSlot(restaurant=restaurant, start_time=slot.time(), end_time=(slot4 + timedelta(minutes=30)).time(), date=date)
                         two_hour_slot.save()
                         two_hour_booking_slots.append(two_hour_slot)
-            return render(request, 'slotpick.html', {"date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
+                count = len(two_hour_booking_slots)
+            return render(request, 'slotpick.html', {"page_valid": page_valid, "prev_exists": prev_exists, "count": count, "date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
         return render(request, 'bookrestaurant.html', {"restaurant": restaurant, "form": form})
 
 
@@ -382,29 +395,30 @@ class PickSlotView(View):
         start_time3 = start_time2 + timedelta(minutes=30)
         slot1 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time.time(), date=slot.date).first()
         if slot1 is None:
-            slot1 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time.time(), date=slot.date)
+            slot1 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time.time(), date=slot.date, free_tables=restaurant.tables)
         slot2 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time1.time(), date=slot.date).first()
         if slot2 is None:
-            slot2 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time1.time(), date=slot.date)
+            slot2 = ThirtyMinuteBookingSlot(free_tables=restaurant.tables, restaurant=restaurant, start_time=start_time1.time(), date=slot.date)
         slot3 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time2.time(), date=slot.date).first()
         if slot3 is None:
-            slot3 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time2.time(), date=slot.date)
+            slot3 = ThirtyMinuteBookingSlot(free_tables=restaurant.tables, restaurant=restaurant, start_time=start_time2.time(), date=slot.date)
         slot4 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time3.time(), date=slot.date).first()
         if slot4 is None:
-            slot4 = ThirtyMinuteBookingSlot(restaurant=restaurant, start_time=start_time3.time(), date=slot.date)
-        slot1.occupied_tables += 1
-        slot2.occupied_tables += 1
-        slot3.occupied_tables += 1
-        slot4.occupied_tables += 1
-        slot1.free_tables -= 1
-        slot2.free_tables -= 1
-        slot3.free_tables -= 1
-        slot4.free_tables -= 1
+            slot4 = ThirtyMinuteBookingSlot(free_tables=restaurant.tables, restaurant=restaurant, start_time=start_time3.time(), date=slot.date)
+        number_of_tables_required = math.ceil(number / restaurant.people_per_table)
+        slot1.occupied_tables += number_of_tables_required
+        slot2.occupied_tables += number_of_tables_required
+        slot3.occupied_tables += number_of_tables_required
+        slot4.occupied_tables += number_of_tables_required
+        slot1.free_tables -= number_of_tables_required
+        slot2.free_tables -= number_of_tables_required
+        slot3.free_tables -= number_of_tables_required
+        slot4.free_tables -= number_of_tables_required
         slot1.save()
         slot2.save()
         slot3.save()
         slot4.save()
-        messages.success(request, "Booking completed successfully.")
+        messages.success(request, "Booking request completed successfully. Check your profile for updates on your request.")
         return redirect('restaurantdetail', id=restaurant.id, pageno=0)
 
 
@@ -413,6 +427,13 @@ class BookNextDay(View):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_date = datetime.strptime(date, "%Y-%m-%d").date()
         date = next_date + timedelta(days=1)
+        page_valid = True
+        if date < timezone.now().date():
+            page_valid = False
+        prev_date = date - timedelta(days=1)
+        prev_exists = True
+        if prev_date < timezone.now().date():
+            prev_exists = False
         number_of_people = number
         start_time = datetime.combine(date, restaurant.start_time)
         end_time = datetime.combine(date, restaurant.end_time)
@@ -426,10 +447,13 @@ class BookNextDay(View):
         available_slots = []
         for slot in slots:
             booking = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=slot.time(), date=date).first()
+            number_of_tables_required = math.ceil(number_of_people / restaurant.people_per_table)
             if booking is not None and booking.free_tables > 0:
-                available_slots.append(slot)
+                if booking.free_tables >= number_of_tables_required:
+                    available_slots.append(slot)
             elif booking is None:
-                available_slots.append(slot)
+                if restaurant.tables >= number_of_tables_required:
+                    available_slots.append(slot)
         print(available_slots)
         two_hour_booking_slots = []
         for slot in available_slots:
@@ -440,7 +464,9 @@ class BookNextDay(View):
                 two_hour_slot = TwoHourBookingSlot(restaurant=restaurant, start_time=slot.time(), end_time=(slot4 + timedelta(minutes=30)).time(), date=date)
                 two_hour_slot.save()
                 two_hour_booking_slots.append(two_hour_slot)
-        return render(request, 'slotpick.html', {"date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
+
+        count = len(two_hour_booking_slots)
+        return render(request, 'slotpick.html', {"page_valid": page_valid, "prev_exists": prev_exists, "count": count, "date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
 
 
 class BookPrevDay(View):
@@ -448,6 +474,13 @@ class BookPrevDay(View):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_date = datetime.strptime(date, "%Y-%m-%d").date()
         date = next_date - timedelta(days=1)
+        page_valid = True
+        if date < timezone.now().date():
+            page_valid = False
+        prev_date = date - timedelta(days=1)
+        prev_exists = True
+        if prev_date < timezone.now().date():
+            prev_exists = False
         number_of_people = number
         start_time = datetime.combine(date, restaurant.start_time)
         end_time = datetime.combine(date, restaurant.end_time)
@@ -461,10 +494,13 @@ class BookPrevDay(View):
         available_slots = []
         for slot in slots:
             booking = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=slot.time(), date=date).first()
+            number_of_tables_required = math.ceil(number_of_people / restaurant.people_per_table)
             if booking is not None and booking.free_tables > 0:
-                available_slots.append(slot)
+                if booking.free_tables >= number_of_tables_required:
+                    available_slots.append(slot)
             elif booking is None:
-                available_slots.append(slot)
+                if restaurant.tables >= number_of_tables_required:
+                    available_slots.append(slot)
         print(available_slots)
         two_hour_booking_slots = []
         for slot in available_slots:
@@ -475,5 +511,75 @@ class BookPrevDay(View):
                 two_hour_slot = TwoHourBookingSlot(restaurant=restaurant, start_time=slot.time(), end_time=(slot4 + timedelta(minutes=30)).time(), date=date)
                 two_hour_slot.save()
                 two_hour_booking_slots.append(two_hour_slot)
-        return render(request, 'slotpick.html', {"date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
+        count = len(two_hour_booking_slots)
+        return render(request, 'slotpick.html', {"page_valid": page_valid, "prev_exists": prev_exists, "count": count, "date": date, "restaurant": restaurant, "two_hour_booking_slots": two_hour_booking_slots, "number_of_people": number_of_people})
 
+
+class DeleteBookingView(View):
+    def post(self, request, id):
+        booking = get_object_or_404(Booking, id=id)
+        restaurant = booking.restaurant
+        start_time = datetime.combine(booking.date, booking.start_time)
+        start_time1 = start_time + timedelta(minutes=30)
+        start_time2 = start_time1 + timedelta(minutes=30)
+        start_time3 = start_time2 + timedelta(minutes=30)
+        slot1 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time.time(), date=booking.date).first()
+        slot2 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time1.time(), date=booking.date).first()
+        slot3 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time2.time(), date=booking.date).first()
+        slot4 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time3.time(), date=booking.date).first()
+        number_of_tables_required = math.ceil(booking.number_of_people / restaurant.people_per_table)
+        slot1.occupied_tables -= number_of_tables_required
+        slot2.occupied_tables -= number_of_tables_required
+        slot3.occupied_tables -= number_of_tables_required
+        slot4.occupied_tables -= number_of_tables_required
+        slot1.free_tables += number_of_tables_required
+        slot2.free_tables += number_of_tables_required
+        slot3.free_tables += number_of_tables_required
+        slot4.free_tables += number_of_tables_required
+        slot1.save()
+        slot2.save()
+        slot3.save()
+        slot4.save()
+        booking.delete()
+        bookings = Booking.objects.filter(user=request.user).order_by('id')
+        count = bookings.count()
+        messages.success(request,
+                         "Booking request deleted successfully.")
+        return render(request, 'userbookings.html', {'count': count, 'bookings': bookings})
+
+
+class DeleteBookingOwnerView(View):
+    def post(self, request, id):
+        booking = get_object_or_404(Booking, id=id)
+        restaurant = booking.restaurant
+        start_time = datetime.combine(booking.date, booking.start_time)
+        start_time1 = start_time + timedelta(minutes=30)
+        start_time2 = start_time1 + timedelta(minutes=30)
+        start_time3 = start_time2 + timedelta(minutes=30)
+        slot1 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time.time(), date=booking.date).first()
+        slot2 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time1.time(), date=booking.date).first()
+        slot3 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time2.time(), date=booking.date).first()
+        slot4 = ThirtyMinuteBookingSlot.objects.filter(restaurant=restaurant, start_time=start_time3.time(), date=booking.date).first()
+        number_of_tables_required = math.ceil(booking.number_of_people / restaurant.people_per_table)
+        slot1.occupied_tables -= number_of_tables_required
+        slot2.occupied_tables -= number_of_tables_required
+        slot3.occupied_tables -= number_of_tables_required
+        slot4.occupied_tables -= number_of_tables_required
+        slot1.free_tables += number_of_tables_required
+        slot2.free_tables += number_of_tables_required
+        slot3.free_tables += number_of_tables_required
+        slot4.free_tables += number_of_tables_required
+        slot1.save()
+        slot2.save()
+        slot3.save()
+        slot4.save()
+        restaurant = booking.restaurant
+        booking.delete()
+        bookings = Booking.objects.filter(restaurant=restaurant).order_by('id')
+        requested_user = request.user
+        count = bookings.count()
+        messages.success(request,
+                         "Booking request deleted successfully.")
+        return render(request, 'bookingslist.html',
+                      {'count': count, 'restaurant': restaurant, 'bookings': bookings,
+                       'requested_user': requested_user})

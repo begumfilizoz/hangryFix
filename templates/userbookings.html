@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Your Bookings{% endblock %}
+
+{% block content %}
+    <h2>Your Bookings</h2>
+    <p style="color: saddlebrown">{{ count }} booking requests</p>
+    <p>See if your booking requests have been approved and cancel them if you wish. The bookings you made for past dates are automatically removed.</p>
+    <a href="{% url 'profile' user.id %}"><button class="check-reviews" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';">
+                    Back to Profile</button></a>
+    <div class="column">
+        {% for booking in bookings %}
+            <div style="width: 100%;
+                height: 200px !important;
+                margin-top: 10px;
+                padding: 10px;
+                padding-bottom: 0px;
+                padding-top: 0px;
+                background-color: rgb(138, 117, 98, 0.8);
+                border-radius: 20px;
+                display:flex;
+                flex-wrap: nowrap;
+                justify-content: flex-start;">
+                <div class="restaurant-image"><img src="{{ booking.restaurant.image.url }}"></div>
+                <div class="restaurant-info">
+                    <a href="{% url 'restaurantdetail' booking.restaurant.id 0 %}">
+                    <p style="font-size: 25px; color:#f0d067">{{ booking.restaurant.name }}</p>
+                    </a>
+                    <p class="restaurant-city" style="color:#4a0d0d"><i class="fa-solid fa-map-location-dot"></i>  {{ booking.restaurant.city.name }}, {{ booking.restaurant.country.name }}</p>
+                    <p style="font-weight: bold">Date of Booking: {{ booking.date }}</p>
+                    <p style="font-weight: bold">Time: {{ booking.start_time }} - {{ booking.end_time }}</p>
+                <p style="font-weight: bold">Number of People You Booked For: {{ booking.number_of_people }}</p>
+                    <p style="display: inline; font-weight: bold">Request Status:</p>
+                    {% if booking.approved %}
+                        <p style="display: inline; color: green">Approved</p>
+                    {% else %}
+                        <p style="display: inline; color: darkred">Not Yet Approved</p>
+                    {% endif %}
+                </div>
+                <div style="padding-top: 50px; padding-left: 30px;
+    flex-wrap: nowrap;
+    margin-left: auto;">
+                <a href="{% url 'restaurantdetail' booking.restaurant.id 0 %}">
+                    <button class="booking" style="height: 40px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                            onmouseover="this.style.backgroundColor='brown';"
+                            onmouseout="this.style.backgroundColor='#f0d067';">
+                        Check Reviews</button>
+                </a>
+                <form style="display: inline;" method="post" action="{% url 'delete-booking' booking.id %}">
+                    {% csrf_token %}
+                    <button class="booking" style="height: 40px; margin-top: 10px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                            onmouseover="this.style.backgroundColor='brown';"
+                            onmouseout="this.style.backgroundColor='#f0d067';">
+                        Cancel Booking</button>
+                </form>
+                    </div>
+
+            </div>
+        {% endfor %}
+    </div>
+    {% if messages %}
+    {% for message in messages %}
+        <script>alert("{{ message }}");</script>
+    {% endfor %}
+{% endif %}
+{% endblock %}
