@@ -259,23 +259,57 @@ class NextRestaurantDetailView(View):
                        'restaurant_in_favorites': restaurant_in_favorites})
 
 
+# class LikeUnlikeReviewView(View):
+#     def post(self, request, id, pageno):
+#         comment = get_object_or_404(Comment, id=id)
+#         restaurant = get_object_or_404(Restaurant, id=comment.restaurant.id)
+#         user = request.user
+#         if user.is_authenticated:
+#             if Like.objects.filter(user=user, comment=comment).exists():
+#                 Like.objects.filter(user=user, comment=comment).delete()
+#                 messages.success(request, 'You unliked the review.')
+#                 return redirect('restaurantdetail', id=restaurant.id, pageno=pageno)
+#             else:
+#                 Like.objects.create(user=user, comment=comment)
+#                 messages.success(request, 'You liked the review.')
+#                 return redirect('restaurantdetail', id=restaurant.id, pageno=pageno)
+#         else:
+#             messages.success(request, 'Log in to like the review.')
+#             return redirect('restaurantdetail', id=restaurant.id, pageno=pageno)
+
+
 class LikeUnlikeReviewView(View):
     def post(self, request, id, pageno):
         comment = get_object_or_404(Comment, id=id)
         restaurant = get_object_or_404(Restaurant, id=comment.restaurant.id)
         user = request.user
+
         if user.is_authenticated:
-            if Like.objects.filter(user=user, comment=comment).exists():
+            liked = Like.objects.filter(user=user, comment=comment).exists()
+
+            if liked:
                 Like.objects.filter(user=user, comment=comment).delete()
-                messages.success(request, 'You unliked the review.')
-                return redirect('restaurantdetail', id=restaurant.id, pageno=pageno)
+                message = 'You unliked the review.'
+                liked = False
             else:
                 Like.objects.create(user=user, comment=comment)
-                messages.success(request, 'You liked the review.')
-                return redirect('restaurantdetail', id=restaurant.id, pageno=pageno)
+                message = 'You liked the review.'
+                liked = True
+
+            response_data = {
+                'success': True,
+                'message': message,
+                'liked': liked,
+                'restaurant_id': restaurant.id,
+                'pageno': pageno
+            }
+            return JsonResponse(response_data)
         else:
-            messages.success(request, 'Log in to like the review.')
-            return redirect('restaurantdetail', id=restaurant.id, pageno=pageno)
+            response_data = {
+                'success': False,
+                'message': 'Log in to like the review.'
+            }
+            return JsonResponse(response_data)
 
 
 class MenuView(View):

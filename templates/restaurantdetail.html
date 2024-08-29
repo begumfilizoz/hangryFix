@@ -80,7 +80,7 @@
             {% endif %}
 
         <div style="text-align: center; width: 40%">
-        <p style="height: 20px; margin: auto; margin-top: -5px; margin-bottom: -3px">{{ comment.like_set.all.count }} likes</p>
+        <p id="like-count-{{ comment.id }}" class="like-count" style="height: 20px; margin: auto; margin-top: -5px; margin-bottom: 2px">{{ comment.like_set.all.count }} likes</p>
         {% if comment.user == user %}
             <form method="post" action="{% url 'deletecommentfromrest' restaurant.id comment.id %}">
                 {% csrf_token %}
@@ -92,7 +92,7 @@
             </form>
         {% endif %}
         {% if user.is_authenticated %}
-            {% if comment in liked_comments %}
+            {% comment %}{% if comment in liked_comments %}
                 <form method="post" action="{% url 'likeunlikecomment' comment.id pageno %}">
                      {% csrf_token %}
                     <div style="height: 50px; justify-content: center; text-align: center; padding: 5px">
@@ -110,7 +110,19 @@
                         onmouseout="this.style.backgroundColor='#f0d067';">Like</button>
                     </div>
                 </form>
-            {% endif %}
+            {% endif %}{% endcomment %}
+            <button class="like-button" style=" font-size: 12px; margin: auto; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
+                        onmouseover="this.style.backgroundColor='brown';"
+                        onmouseout="this.style.backgroundColor='#f0d067';"
+                    data-comment-id="{{ comment.id }}" 
+                    data-url="{% url 'likeunlikecomment' comment.id pageno %}" 
+                    data-pageno="{{ pageno }}">
+                {% if comment in liked_comments %}
+                    Unlike
+                {% else %}
+                    Like
+                {% endif %}
+            </button>
         {% endif %}
         </div>
         </div>
@@ -138,4 +150,41 @@
         <script>alert("{{ message }}");</script>
     {% endfor %}
 {% endif %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.like-button').on('click', function(event) {
+        event.preventDefault();
+        
+        var button = $(this);
+        var commentId = button.data('comment-id');
+        var pageno = button.data('pageno');
+        var url = button.data('url');
+        var likeCountElement = $('#like-count-' + commentId);
+        
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: {
+                id: commentId,
+                pageno: pageno,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                if (response.success) {
+                    button.toggleClass('liked', response.liked);
+                    button.text(response.liked ? 'Unlike' : 'Like');
+                    var currentLikeCount = parseInt(likeCountElement.text());
+                    likeCountElement.text((response.liked ? currentLikeCount + 1 : currentLikeCount - 1) + ' likes');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                alert('An error occurred.');
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}
