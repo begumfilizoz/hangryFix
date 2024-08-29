@@ -351,12 +351,15 @@ class BookingView(View):
                 number_of_people = form.cleaned_data.get('number_of_people')
                 start_time = datetime.combine(date, restaurant.start_time)
                 end_time = datetime.combine(date, restaurant.end_time)
+                start_time = timezone.make_aware(start_time, timezone.get_current_timezone())
+                end_time = timezone.make_aware(end_time, timezone.get_current_timezone())
                 start_time = start_time.replace(minute=0, second=0, microsecond=0)
                 end_time = end_time.replace(minute=0, second=0, microsecond=0)
                 slots = []
                 current_time = start_time
                 while current_time < end_time:
-                    slots.append(current_time)
+                    if date > timezone.now().date() or (date == timezone.now().date() and current_time > timezone.now()):
+                        slots.append(current_time)
                     current_time = current_time + timedelta(minutes=30)
                 available_slots = []
                 for slot in slots:
@@ -437,12 +440,15 @@ class BookNextDay(View):
         number_of_people = number
         start_time = datetime.combine(date, restaurant.start_time)
         end_time = datetime.combine(date, restaurant.end_time)
+        start_time = timezone.make_aware(start_time, timezone.get_current_timezone())
+        end_time = timezone.make_aware(end_time, timezone.get_current_timezone())
         start_time = start_time.replace(minute=0, second=0, microsecond=0)
         end_time = end_time.replace(minute=0, second=0, microsecond=0)
         slots = []
         current_time = start_time
         while current_time < end_time:
-            slots.append(current_time)
+            if date > timezone.now().date() or (date == timezone.now().date() and current_time > timezone.now()):
+                slots.append(current_time)
             current_time = current_time + timedelta(minutes=30)
         available_slots = []
         for slot in slots:
@@ -484,12 +490,15 @@ class BookPrevDay(View):
         number_of_people = number
         start_time = datetime.combine(date, restaurant.start_time)
         end_time = datetime.combine(date, restaurant.end_time)
+        start_time = timezone.make_aware(start_time, timezone.get_current_timezone())
+        end_time = timezone.make_aware(end_time, timezone.get_current_timezone())
         start_time = start_time.replace(minute=0, second=0, microsecond=0)
         end_time = end_time.replace(minute=0, second=0, microsecond=0)
         slots = []
         current_time = start_time
         while current_time < end_time:
-            slots.append(current_time)
+            if date > timezone.now().date() or (date == timezone.now().date() and current_time > timezone.now()):
+                slots.append(current_time)
             current_time = current_time + timedelta(minutes=30)
         available_slots = []
         for slot in slots:

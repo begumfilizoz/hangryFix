@@ -37,7 +37,11 @@
         </div>
         <h2><br>Your Reviews:</h2>
         {% for comment in comments %}
-            <li style="border-radius: 10px; background-color: rgb(138, 117, 98, 0.8); border: solid; border-color: brown; padding: 5px; margin-top: 5px; ">For {{ comment.restaurant.name }}, you gave {{ comment.rating }} stars
+            <li style="border-radius: 10px; background-color: rgb(138, 117, 98, 0.8); border: solid; border-color: brown; padding: 5px; margin-top: 5px; ">For 
+                <a href="{% url 'restaurantdetail' comment.restaurant.id 0 %}">
+                    <strong style="color:brown">{{ comment.restaurant.name }}</strong>
+                </a>
+                , you gave {{ comment.rating }} stars
                 {% if comment.comment %}
                     and this review: {{ comment.comment }} <br>
                 {% endif %}
