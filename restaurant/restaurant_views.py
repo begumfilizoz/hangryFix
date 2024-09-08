@@ -24,6 +24,7 @@ class AddRestaurantView(View):
     def post(self, request):
         form = AddRestaurantForm(request.POST, request.FILES)
         if form.is_valid():
+            # saves the restaurant to the database
             restaurant = form.save(commit=False)
             restaurant.owner = request.user
             restaurant.point = 0
@@ -34,6 +35,7 @@ class AddRestaurantView(View):
 
 class GetCitiesAndCountriesView(View):
     def get(self, request):
+        # returns the cities that are in a particular country
         country_id = request.GET.get('country_id')
         cities = City.objects.filter(country_id=country_id)
         cities_data = list(cities.values('id', 'name'))
@@ -44,23 +46,36 @@ class RestaurantDetailView(View):
     def get(self, request, id, pageno):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_exists = True
+
+        # gets the likes given by the logged in user
         if request.user.is_authenticated:
             likes = Like.objects.filter(user=request.user)
+
+        # gets the comments made for that restaurant
         comments = Comment.objects.filter(restaurant=restaurant)
+
+        # checks if there are more comments to be displayed in the next page and takes the first 5 comments based on
+        # page no
         if (pageno + 1) * 5 > comments.count():
             next_exists = False
         comments = comments[pageno * 5:pageno * 5 + 5]
+
+        # finds the comments liked by that user for this restaurant
         liked_comments = []
         if request.user.is_authenticated:
             for like in likes:
                 if like.comment in comments:
                     liked_comments.append(like.comment)
+
         rating = restaurant.find_rating()
         form = AddCommentForm()
+
+        # shows the location of the restaurant on the map
         m = folium.Map(location=[restaurant.lat, restaurant.lng], zoom_start=15)
         folium.Marker([restaurant.lat, restaurant.lng], popup=restaurant.name).add_to(m)
         map_html = m._repr_html_()
-        if request.user.favorites in restaurant.favorites.all():
+
+        if request.user.is_authenticated and request.user.favorites in restaurant.favorites.all():
             restaurant_in_favorites = True
         else:
             restaurant_in_favorites = False
@@ -72,24 +87,36 @@ class RestaurantDetailView(View):
     def post(self, request, id, pageno):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_exists = True
+
+        # gets the likes given by the logged in user
         if request.user.is_authenticated:
             likes = Like.objects.filter(user=request.user)
         comments = Comment.objects.filter(restaurant=restaurant)
+
+        # checks if there are more comments to be displayed in the next page and takes the first 5 comments based on
+        # page no
         if (pageno + 1) * 5 > comments.count():
             next_exists = False
         comments = comments[pageno * 5:pageno * 5 + 5]
+
+        # finds the comments liked by that user for this restaurant
         liked_comments = []
         if request.user.is_authenticated:
             for like in likes:
                 if like.comment in comments:
                     liked_comments.append(like.comment)
+
         rating = restaurant.find_rating()
         form = AddCommentForm()
+
+        # shows the location of the restaurant on the map
         m = folium.Map(location=[restaurant.lat, restaurant.lng], zoom_start=15)
         folium.Marker([restaurant.lat, restaurant.lng], popup=restaurant.name).add_to(m)
         map_html = m._repr_html_()
+
+        # gets the form data and saves comment
         form = AddCommentForm(request.POST)
-        if request.user.favorites in restaurant.favorites.all():
+        if request.user.is_authenticated and request.user.favorites in restaurant.favorites.all():
             restaurant_in_favorites = True
         else:
             restaurant_in_favorites = False
@@ -114,14 +141,17 @@ class PrevRestaurantDetailView(View):
     def get(self, request, id, pageno):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_exists = True
+
         if request.user.is_authenticated:
             likes = Like.objects.filter(user=request.user)
         comments = Comment.objects.filter(restaurant=restaurant)
+
         if pageno > 0:
             pageno = pageno - 1
             if (pageno + 1) * 5 > comments.count():
                 next_exists = False
             comments = comments[pageno * 5:pageno * 5 + 5]
+
         liked_comments = []
         if request.user.is_authenticated:
             for like in likes:
@@ -129,10 +159,11 @@ class PrevRestaurantDetailView(View):
                     liked_comments.append(like.comment)
         rating = restaurant.find_rating()
         form = AddCommentForm()
+
         m = folium.Map(location=[restaurant.lat, restaurant.lng], zoom_start=15)
         folium.Marker([restaurant.lat, restaurant.lng], popup=restaurant.name).add_to(m)
         map_html = m._repr_html_()
-        if request.user.favorites in restaurant.favorites.all():
+        if request.user.is_authenticated and request.user.favorites in restaurant.favorites.all():
             restaurant_in_favorites = True
         else:
             restaurant_in_favorites = False
@@ -145,14 +176,17 @@ class PrevRestaurantDetailView(View):
     def post(self, request, id, pageno):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_exists = True
+
         if request.user.is_authenticated:
             likes = Like.objects.filter(user=request.user)
         comments = Comment.objects.filter(restaurant=restaurant)
+
         if pageno > 0:
             pageno = pageno - 1
             if (pageno + 1) * 5 > comments.count():
                 next_exists = False
             comments = comments[pageno * 5:pageno * 5 + 5]
+
         liked_comments = []
         if request.user.is_authenticated:
             for like in likes:
@@ -160,11 +194,12 @@ class PrevRestaurantDetailView(View):
                     liked_comments.append(like.comment)
         rating = restaurant.find_rating()
         form = AddCommentForm()
+
         m = folium.Map(location=[restaurant.lat, restaurant.lng], zoom_start=15)
         folium.Marker([restaurant.lat, restaurant.lng], popup=restaurant.name).add_to(m)
         map_html = m._repr_html_()
         form = AddCommentForm(request.POST)
-        if request.user.favorites in restaurant.favorites.all():
+        if request.user.is_authenticated and request.user.favorites in restaurant.favorites.all():
             restaurant_in_favorites = True
         else:
             restaurant_in_favorites = False
@@ -189,25 +224,30 @@ class NextRestaurantDetailView(View):
     def get(self, request, id, pageno):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_exists = True
+
         if request.user.is_authenticated:
             likes = Like.objects.filter(user=request.user)
         comments = Comment.objects.filter(restaurant=restaurant)
+
         if pageno != -1:
             pageno = pageno + 1
             if (pageno + 1) * 5 > comments.count():
                 next_exists = False
             comments = comments[pageno * 5:pageno * 5 + 5]
+
         liked_comments = []
         if request.user.is_authenticated:
             for like in likes:
                 if like.comment in comments:
                     liked_comments.append(like.comment)
+
         rating = restaurant.find_rating()
         form = AddCommentForm()
+
         m = folium.Map(location=[restaurant.lat, restaurant.lng], zoom_start=15)
         folium.Marker([restaurant.lat, restaurant.lng], popup=restaurant.name).add_to(m)
         map_html = m._repr_html_()
-        if request.user.favorites in restaurant.favorites.all():
+        if request.user.is_authenticated and request.user.favorites in restaurant.favorites.all():
             restaurant_in_favorites = True
         else:
             restaurant_in_favorites = False
@@ -238,7 +278,7 @@ class NextRestaurantDetailView(View):
         folium.Marker([restaurant.lat, restaurant.lng], popup=restaurant.name).add_to(m)
         map_html = m._repr_html_()
         form = AddCommentForm(request.POST)
-        if request.user.favorites in restaurant.favorites.all():
+        if request.user.is_authenticated and request.user.favorites in restaurant.favorites.all():
             restaurant_in_favorites = True
         else:
             restaurant_in_favorites = False

@@ -4,20 +4,22 @@
 
 {% block content %}
     <div class="restaurant-detail-image"><img src="{{ restaurant.image.url }}"></div>
-    {% if restaurant_in_favorites %}
-        <h1>{{ restaurant.name }}</h1>
-        <h5 style="color: brown">
-        <form method="post" action="{% url 'removefromfavorites' restaurant.id pageno %}" style="color: brown">{% csrf_token %} <button type="submit" style="background: none; border: none; padding: 0;">
-                <i style="color: brown" class="fa-solid fa-heart"></i>  Remove From Your Favorites <br>
-        </button></form>
-        </h5>
-    {% else %}
-      <h1>{{ restaurant.name }}</h1>
-        <h5 style="color: brown">
-        <form method="post" action="{% url 'addtofavorites' restaurant.id pageno %}" style="color: brown">{% csrf_token %}<button type="submit" style="background: none; border: none; padding: 0;">
-                <i style="color: brown" class="fa-regular fa-heart"></i>  Add To Your Favorites <br>
+    <h1>{{ restaurant.name }}</h1>
+    {% if user.is_authenticated %}
+        {% if restaurant_in_favorites %}
+            
+            <h5 style="color: brown">
+            <form method="post" action="{% url 'removefromfavorites' restaurant.id pageno %}" style="color: brown">{% csrf_token %} <button type="submit" style="background: none; border: none; padding: 0;">
+                    <i style="color: brown" class="fa-solid fa-heart"></i>  Remove From Your Favorites <br>
             </button></form>
-        </h5>
+            </h5>
+        {% else %}
+            <h5 style="color: brown">
+            <form method="post" action="{% url 'addtofavorites' restaurant.id pageno %}" style="color: brown">{% csrf_token %}<button type="submit" style="background: none; border: none; padding: 0;">
+                    <i style="color: brown" class="fa-regular fa-heart"></i>  Add To Your Favorites <br>
+                </button></form>
+            </h5>
+        {% endif %}
     {% endif %}
 
     <p style="font-weight: bold; color: brown"><br><i class="fa-solid fa-star"></i>  Rating: {{ rating|floatformat:1 }}</p>
@@ -155,13 +157,13 @@
 $(document).ready(function() {
     $('.like-button').on('click', function(event) {
         event.preventDefault();
-        
+
         var button = $(this);
         var commentId = button.data('comment-id');
         var pageno = button.data('pageno');
         var url = button.data('url');
         var likeCountElement = $('#like-count-' + commentId);
-        
+
         $.ajax({
             type: 'POST',
             url: url,
