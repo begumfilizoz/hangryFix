@@ -62,14 +62,14 @@
         </div>
         <div style="justify-content: center; width: 100%;">
             {% if page_no != 0 %}
-            <a href="{% url 'prevfavorites' user.id page_no %}">
+            <a href="{% url 'favorites' user.id page_no|add:'-1' %}">
             <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                                 onmouseover="this.style.backgroundColor='brown';" 
                                 onmouseout="this.style.backgroundColor='#f0d067';">Previous Page</button>
             </a>
             {% endif %}
             {% if next_exists %}
-            <a href="{% url 'nextfavorites' user.id page_no %}">
+            <a href="{% url 'favorites' user.id page_no|add:'1' %}">
             <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; text-align: right; float: right;" 
                                 onmouseover="this.style.backgroundColor='brown';" 
                                 onmouseout="this.style.backgroundColor='#f0d067';">Next Page</button>

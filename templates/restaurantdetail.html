@@ -133,14 +133,14 @@
     
     <div style="justify-content: center; width: 100%;">
     {% if pageno != 0 %}
-    <a href="{% url 'restaurantprevcomments' restaurant.id pageno %}">
+    <a href="{% url 'restaurantdetail' restaurant.id pageno|add:'-1' %}">
     <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">Previous Page</button>
     </a>
     {% endif %}
     {% if next_exists %}
-    <a href="{% url 'restaurantnextcomments' restaurant.id pageno %}">
+    <a href="{% url 'restaurantdetail' restaurant.id pageno|add:'1' %}">
     <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; text-align: right; float: right;" 
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">Next Page</button>

@@ -11,40 +11,26 @@ from django.http import JsonResponse
 from cities_light.models import City, Country
 from django.contrib import messages
 import folium
+from urllib.parse import urlencode
 
 
 class RestrictedHomeView(View):
-    def get(self, request, link, pageno):
+    def get(self, request, pageno):
         next_exists = True
-        if link == "all":
-            restaurants = Restaurant.objects.all()
-        else:
-            keywords = {'country': -1, 'city': -1, 'cuisine': -1}
-            print(link)
-            link_to_list = link.split("-")
-            print(link_to_list)
-            filters = {}
-            name = ""
-            name_exists = False
-            for pair in link_to_list:
-                if pair.split("=")[0] == "name":
-                    name_exists = True
-                    name = pair.split("=")[1]
-                else:
-                    keywords[pair.split("=")[0]] = int(pair.split("=")[1])
-            if keywords['country'] != -1:
-                country_id = keywords['country']
-                filters['country'] = get_object_or_404(Country, id=country_id)
-            if keywords['city'] != -1:
-                city_id = keywords['city']
-                filters['city'] = get_object_or_404(City, id=city_id)
-            if keywords['cuisine'] != -1:
-                cuisine_id = keywords['cuisine']
-                filters['cuisine'] = get_object_or_404(Cuisine, id=cuisine_id)
-            restaurants = Restaurant.objects.filter(**filters)
-            if name_exists:
-                restaurants = restaurants.filter(name__icontains=name)
-            print(filters)
+        filters = {}
+        name = request.GET.get('name')
+        country_id = request.GET.get('country')
+        city_id = request.GET.get('city')
+        cuisine_id = request.GET.get('cuisine')
+        if country_id:
+            filters['country'] = get_object_or_404(Country, id=country_id)
+        if city_id:
+            filters['city'] = get_object_or_404(City, id=city_id)
+        if cuisine_id:
+            filters['cuisine'] = get_object_or_404(Cuisine, id=cuisine_id)
+        restaurants = Restaurant.objects.filter(**filters)
+        if name:
+            restaurants = restaurants.filter(name__icontains=name)
         if pageno != -1:
             if (pageno + 1) * 5 > restaurants.count():
                 next_exists = False
@@ -53,102 +39,6 @@ class RestrictedHomeView(View):
         context = {
             'restaurants': restaurants,
             'pageno': pageno,
-            'link': link,
-            'next_exists': next_exists
-        }
-        return render(request, 'home.html', context)
-
-
-class PrevPageView(View):
-    def get(self, request, link, pageno):
-        next_exists = True
-        if link == "all":
-            restaurants = Restaurant.objects.all()
-        else:
-            keywords = {'country': -1, 'city': -1, 'cuisine': -1}
-            print(link)
-            link_to_list = link.split("-")
-            print(link_to_list)
-            filters = {}
-            name = ""
-            name_exists = False
-            for pair in link_to_list:
-                if pair.split("=")[0] == "name":
-                    name_exists = True
-                    name = pair.split("=")[1]
-                else:
-                    keywords[pair.split("=")[0]] = int(pair.split("=")[1])
-            if keywords['country'] != -1:
-                country_id = keywords['country']
-                filters['country'] = get_object_or_404(Country, id=country_id)
-            if keywords['city'] != -1:
-                city_id = keywords['city']
-                filters['city'] = get_object_or_404(City, id=city_id)
-            if keywords['cuisine'] != -1:
-                cuisine_id = keywords['cuisine']
-                filters['cuisine'] = get_object_or_404(Cuisine, id=cuisine_id)
-            restaurants = Restaurant.objects.filter(**filters)
-            if name_exists:
-                restaurants = restaurants.filter(name__icontains=name)
-            print(filters)
-        if pageno > 0:
-            pageno = pageno - 1
-            if (pageno + 1) * 5 > restaurants.count():
-                next_exists = False
-            restaurants.order_by('id')
-            restaurants = restaurants[pageno * 5:pageno * 5 + 5]
-        context = {
-            'restaurants': restaurants,
-            'pageno': pageno,
-            'link': link,
-            'next_exists': next_exists
-        }
-        return render(request, 'home.html', context)
-
-
-class NextPageView(View):
-    def get(self, request, link, pageno):
-        next_exists = True
-        if link == "all":
-            restaurants = Restaurant.objects.all()
-        else:
-            keywords = {'country': -1, 'city': -1, 'cuisine': -1}
-            print(link)
-            link_to_list = link.split("-")
-            print(link_to_list)
-            filters = {}
-            next_exists = True
-            name = ""
-            name_exists = False
-            for pair in link_to_list:
-                if pair.split("=")[0] == "name":
-                    name_exists = True
-                    name = pair.split("=")[1]
-                else:
-                    keywords[pair.split("=")[0]] = int(pair.split("=")[1])
-            if keywords['country'] != -1:
-                country_id = keywords['country']
-                filters['country'] = get_object_or_404(Country, id=country_id)
-            if keywords['city'] != -1:
-                city_id = keywords['city']
-                filters['city'] = get_object_or_404(City, id=city_id)
-            if keywords['cuisine'] != -1:
-                cuisine_id = keywords['cuisine']
-                filters['cuisine'] = get_object_or_404(Cuisine, id=cuisine_id)
-            restaurants = Restaurant.objects.filter(**filters)
-            if name_exists:
-                restaurants = restaurants.filter(name__icontains=name)
-            print(filters)
-        if pageno != -1:
-            pageno = pageno + 1
-            if (pageno + 1) * 5 > restaurants.count():
-                next_exists = False
-            restaurants.order_by('id')
-            restaurants = restaurants[pageno * 5:pageno * 5 + 5]
-        context = {
-            'restaurants': restaurants,
-            'pageno': pageno,
-            'link': link,
             'next_exists': next_exists
         }
         return render(request, 'home.html', context)
@@ -162,24 +52,34 @@ class SearchView(View):
     def post(self, request):
         form = SearchRestaurantForm(request.POST)
         if form.is_valid():
-            link = ""
-            if form.cleaned_data.get('name') is not None:
+            query_params = {}
+
+            # Fetch the data from the search form and add to query_params
+            if form.cleaned_data.get('name'):
                 name = form.cleaned_data.get('name')
-                link = link + "name=" + str(name) + "-"
-            if form.cleaned_data.get('country') is not None:
+                query_params['name'] = name
+
+            if form.cleaned_data.get('country'):
                 country_id = form.cleaned_data.get('country').id
-                link = link + "country=" + str(country_id) + "-"
-            if form.cleaned_data.get('city') is not None:
+                query_params['country'] = country_id
+
+            if form.cleaned_data.get('city'):
                 city_id = form.cleaned_data.get('city').id
-                link = link + "city=" + str(city_id) + "-"
-            if form.cleaned_data.get('cuisine') is not None:
+                query_params['city'] = city_id
+
+            if form.cleaned_data.get('cuisine'):
                 cuisine_id = form.cleaned_data.get('cuisine').id
-                link = link + "cuisine=" + str(cuisine_id) + "-"
-            if link != "":
-                link = link[:-1]
+                query_params['cuisine'] = cuisine_id
+
+            # Build the query string using urlencode
+            if query_params:
+                query_string = urlencode(query_params)
             else:
-                link = "all"
-            return redirect(f'restrictedhome/{link}/0')
+                query_string = "all=1"  # Default if no parameters are selected
+
+            # Redirect to the URL with query parameters
+            return redirect(f'/restrictedhome/0/?{query_string}')
+
         return render(request, 'searchrestaurant.html', context={'form': form})
 
 

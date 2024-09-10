@@ -18,6 +18,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from geopy.distance import geodesic
 import numpy as np
 import pandas as pd
+from .utils import show_favorites
 
 
 class SignUpView(View):
@@ -158,109 +159,12 @@ class OtherProfileView(View):
         return render(request, 'otherprofile.html', {'other_user': other_user})
 
 
-class PrevFavoritesView(View):
-    def get(self, request, id, page_no):
-        requested_user = get_object_or_404(User, id=id)
-        favorites_list = request.user.favorites
-        next_exists = True
-        if favorites_list:
-            restaurants = Restaurant.objects.filter(favorites=favorites_list).order_by('id')
-        else:
-            restaurants = Restaurant.objects.none()
-        if page_no > 0:
-            page_no = page_no - 1
-            if (page_no + 1) * 5 > restaurants.count():
-                next_exists = False
-            print(page_no)
-            count = restaurants.count()
-            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
-        return render(request, 'favorites.html',
-                      {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
-                       'page_no': page_no, 'count': count})
-
-
-class NextFavoritesView(View):
-    def get(self, request, id, page_no):
-        requested_user = get_object_or_404(User, id=id)
-        favorites_list = request.user.favorites
-        next_exists = True
-        if favorites_list:
-            restaurants = Restaurant.objects.filter(favorites=favorites_list).order_by('id')
-        else:
-            restaurants = Restaurant.objects.none()
-        print(restaurants)
-        if page_no != -1:
-            page_no = page_no + 1
-            if (page_no + 1) * 5 > restaurants.count():
-                next_exists = False
-            print(page_no)
-            count = restaurants.count()
-            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
-        return render(request, 'favorites.html',
-                      {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
-                       'page_no': page_no, 'count': count})
-
-
 class FavoritesView(View):
     def get(self, request, id, page_no):
         requested_user = get_object_or_404(User, id=id)
         favorites_list = request.user.favorites
-        next_exists = True
-        if favorites_list:
-            restaurants = Restaurant.objects.filter(favorites=favorites_list).order_by('id')
-        else:
-            restaurants = Restaurant.objects.none()
-        print(restaurants)
-        if page_no != -1:
-            if (page_no + 1) * 5 > restaurants.count():
-                next_exists = False
-            print(page_no)
-            count = restaurants.count()
-            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
+        count, restaurants, next_exists, page_no = show_favorites(favorites_list, page_no)
         return render(request, 'favorites.html',
-                      {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
-                       'page_no': page_no, 'count': count})
-
-
-class OtherPrevFavoritesView(View):
-    def get(self, request, id, page_no):
-        requested_user = get_object_or_404(User, id=id)
-        favorites_list = requested_user.favorites
-        next_exists = True
-        if favorites_list:
-            restaurants = Restaurant.objects.filter(favorites=favorites_list).order_by('id')
-        else:
-            restaurants = Restaurant.objects.none()
-        if page_no > 0:
-            page_no = page_no - 1
-            if (page_no + 1) * 5 > restaurants.count():
-                next_exists = False
-            print(page_no)
-            count = restaurants.count()
-            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
-        return render(request, 'other-favorites.html',
-                      {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
-                       'page_no': page_no, 'count': count})
-
-
-class OtherNextFavoritesView(View):
-    def get(self, request, id, page_no):
-        requested_user = get_object_or_404(User, id=id)
-        favorites_list = requested_user.favorites
-        next_exists = True
-        if favorites_list:
-            restaurants = Restaurant.objects.filter(favorites=favorites_list).order_by('id')
-        else:
-            restaurants = Restaurant.objects.none()
-        print(restaurants)
-        if page_no != -1:
-            page_no = page_no + 1
-            if (page_no + 1) * 5 > restaurants.count():
-                next_exists = False
-            print(page_no)
-            count = restaurants.count()
-            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
-        return render(request, 'other-favorites.html',
                       {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
                        'page_no': page_no, 'count': count})
 
@@ -269,18 +173,7 @@ class OtherFavoritesView(View):
     def get(self, request, id, page_no):
         requested_user = get_object_or_404(User, id=id)
         favorites_list = requested_user.favorites
-        next_exists = True
-        if favorites_list:
-            restaurants = Restaurant.objects.filter(favorites=favorites_list).order_by('id')
-        else:
-            restaurants = Restaurant.objects.none()
-        print(restaurants)
-        if page_no != -1:
-            if (page_no + 1) * 5 > restaurants.count():
-                next_exists = False
-            print(page_no)
-            count = restaurants.count()
-            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
+        count, restaurants, next_exists, page_no = show_favorites(favorites_list, page_no)
         return render(request, 'other-favorites.html',
                       {'restaurants': restaurants, 'requested_user': requested_user, 'next_exists': next_exists,
                        'page_no': page_no, 'count': count})
