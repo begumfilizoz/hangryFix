@@ -26,7 +26,7 @@
                 justify-content: flex-start;">
                 <div class="restaurant-image"><img src="{{ booking.restaurant.image.url }}"></div>
                 <div class="restaurant-info">
-                    <a href="{% url 'restaurantdetail' booking.restaurant.id 0 %}">
+                    <a href="{% url 'restaurant_detail' booking.restaurant.id 0 %}">
                     <p style="font-size: 25px; color:#f0d067">{{ booking.restaurant.name }}</p>
                     </a>
                     <p class="restaurant-city" style="color:#4a0d0d"><i class="fa-solid fa-map-location-dot"></i>  {{ booking.restaurant.city.name }}, {{ booking.restaurant.country.name }}</p>
@@ -40,11 +40,9 @@
                         <p style="display: inline; color: darkred">Not Yet Approved</p>
                     {% endif %}
                 </div>
-                <div style="padding-top: 50px; padding-left: 30px; padding-right: 10px;
-
-    margin-left: 20px;">
+                <div style="padding-top: 50px; padding-left: 30px; padding-right: 10px; margin-left: 20px;">
                 {% if not booking.approved %}
-                <form method="post" action="{% url 'approve-booking' booking.id %}">
+                <form method="post" action="{% url 'approve_booking' booking.id %}">
                     {% csrf_token %}
                     <button class="booking" style=" height: 40px; background-color: lightgreen; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                             onmouseover="this.style.backgroundColor='brown';"
@@ -52,14 +50,14 @@
                         Approve Booking</button>
                 </form>
                 {% endif %}
-                    <a href="{% url 'restaurantdetail' restaurant.id 0 %}">
+                    <a href="{% url 'restaurant_detail' restaurant.id 0 %}">
                 <button class="check-reviews" style="height: 40px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">
                     Check Reviews</button>
                 </a>
 
-                    <form method="post" action="{% url 'delete-booking-owner' booking.id %}">
+                    <form method="post" action="{% url 'delete_booking_owner' booking.id %}">
                     {% csrf_token %}
                     <button class="booking" style="float: left; height: 40px; background-color: indianred; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                             onmouseover="this.style.backgroundColor='brown';"

@@ -16,22 +16,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <style>
-        @keyframes colorTransition {
-          0% {
-            color: #d32f2f; /* Original color */
-          }
-          50% {
-            color: #0394fc; /* Transition to red */
-          }
-          100% {
-            color: #d32f2f; /* Back to original color */
-          }
-        }
-        #text-color-transition {
-          animation: colorTransition 4s ease-in-out infinite;
-        }
-    </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg navbar-light" id="bar" style="z-index: 1000">
@@ -65,7 +49,7 @@
           </li>
           {% if user.is_authenticated %}
           <li class="nav-item" id="text-color-transition">
-            <a class="nav-link" href="{% url 'restaurant-recommendations' %}">  Restaurants For You</a>
+            <a class="nav-link" href="{% url 'restaurant_recommendations' %}">  Restaurants For You</a>
           </li>
           {% endif %}
         </ul>

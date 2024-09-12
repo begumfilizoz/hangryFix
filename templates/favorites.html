@@ -11,14 +11,14 @@
                                 onmouseout="this.style.backgroundColor='#f0d067';">Return To Profile</button>
                         </a>
         {% if user.favorites_is_private %}
-            <form method="post" action="{% url 'make-public' %}">
+            <form method="post" action="{% url 'make_public' %}">
                 {% csrf_token %}
                 <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                                 onmouseover="this.style.backgroundColor='brown';"
                                 onmouseout="this.style.backgroundColor='#f0d067';">Make Your Favorites Public</button>
             </form>
         {% else %}
-            <form method="post" action="{% url 'make-private' %}">
+            <form method="post" action="{% url 'make_private' %}">
                 {% csrf_token %}
                 <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                                 onmouseover="this.style.backgroundColor='brown';"
@@ -32,15 +32,21 @@
                 <div class="row">
                     <div class="restaurant-image"><img src="{{ restaurant.image.url }}"></div>
                     <div class="restaurant-info">
-                        <a href="{% url 'restaurantdetail' restaurant.id 0 %}">
+                        <a href="{% url 'restaurant_detail' restaurant.id 0 %}">
                         <p class="restaurant-name" style="color:#f0d067">{{ restaurant.name }}</p>
                         </a>
                         <p class="restaurant-city" style="color:#4a0d0d"><i class="fa-solid fa-map-location-dot"></i>  {{ restaurant.city.name }}, {{ restaurant.country.name }}</p>
                         <p class="restaurant-cuisine" style="color:#4a0d0d"><i class="fa-solid fa-utensils"></i>  {{ restaurant.cuisine }} Cuisine</p>
-                        <h3 class="restaurant-rating" style="color:#965500; font-weight: bold"><i class="fa-solid fa-star"></i>  {{ restaurant.find_rating|floatformat:1 }}</h3>
+                        <h3 class="restaurant-rating" style="color:#965500; font-weight: bold"><i class="fa-solid fa-star"></i>
+                            {% if restaurant.find_rating == 0 %}
+                                -
+                            {% else %}
+                            {{ restaurant.find_rating|floatformat:1 }}
+                            {% endif %}
+                        </h3>
                     </div>
                     <div class="check-reviews-div">
-                    <a href="{% url 'restaurantdetail' restaurant.id 0 %}">
+                    <a href="{% url 'restaurant_detail' restaurant.id 0 %}">
                     <button class="check-reviews" style="height: 60px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                             onmouseover="this.style.backgroundColor='brown';"
                             onmouseout="this.style.backgroundColor='#f0d067';">
@@ -50,7 +56,7 @@
                     </div>
 
                 </div>
-                <form method="post" action="{% url 'removefromfavoritesprofile' restaurant.id page_no %}" style="text-align: right">
+                <form method="post" action="{% url 'remove_from_favorites_profile' restaurant.id page_no %}" style="text-align: right">
                             {% csrf_token %}
                             <button class="submit" style="margin-right: 50px; margin-top: 10px; background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                                     onmouseover="this.style.backgroundColor='brown';"

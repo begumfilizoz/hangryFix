@@ -9,7 +9,7 @@
         <div style="justify-content: space-evenly; width: 100%;">
         {% if prev_exists %}
         <span style="width: 200px">
-            <form style="display: inline; width: 200px" method="post" action="{% url 'book-prev-day' restaurant.id date number_of_people %}">
+            <form style="display: inline; width: 200px" method="post" action="{% url 'book_prev_day' restaurant.id date number_of_people %}">
                 {% csrf_token %}
                 <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;"
                                     onmouseover="this.style.backgroundColor='brown';"
@@ -18,7 +18,7 @@
         </span>
         {% endif %}
         <span style="width: 200px">
-            <form style="display: inline; width: 200px" method="post" action="{% url 'book-next-day' restaurant.id date number_of_people %}">
+            <form style="display: inline; width: 200px" method="post" action="{% url 'book_next_day' restaurant.id date number_of_people %}">
                 {% csrf_token %}
                 <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; text-align: right; float: right;"
                                     onmouseover="this.style.backgroundColor='brown';"
@@ -28,7 +28,7 @@
         </div>
         <div class="column">
                 {% for slot in two_hour_booking_slots %}
-                    <form method="post" action="{% url 'pick-the-slot' restaurant.id slot.id number_of_people %}">
+                    <form method="post" action="{% url 'pick_the_slot' restaurant.id slot.id number_of_people %}">
                         {% csrf_token %}
                         <button type="submit" class="slots" style="width: 100%; height: 80px !important; margin-top: 10px; padding: 10px; padding-top: 10px; background-color: rgb(138, 117, 98, 0.8); border-radius: 20px; display:flex; flex-wrap: nowrap; justify-content: center; overflow: auto;">
                             <h4>{{ slot.start_time }} - {{ slot.end_time }}</h4>

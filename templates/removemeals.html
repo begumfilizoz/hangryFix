@@ -7,7 +7,7 @@
     <p>Menu:</p>
     {% for food in restaurant.food_set.all %}
         <li>{{ food.name }} - {{ food.price }}
-            <form method="post" action="{% url 'removemeal' food.id restaurant.id %}">
+            <form method="post" action="{% url 'remove_meal' food.id restaurant.id %}">
                 {% csrf_token %}
                 <button type="submit" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                         onmouseover="this.style.backgroundColor='brown';" 

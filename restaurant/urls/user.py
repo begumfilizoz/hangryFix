@@ -16,20 +16,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from restaurant.views.home_views import (HomeView, RestrictedHomeView, SearchView)
-from restaurant.views.restaurant_views import (DeleteBookingOwnerView, DeleteBookingView, BookNextDay, BookPrevDay, PickSlotView, AddRestaurantView, RestaurantDetailView, AddMealView, RemoveMealsView, RemoveMealView, RemoveRestaurantView,
-                                               DeleteCommentFromRestView, MenuView, GetCitiesAndCountriesView, LikeUnlikeReviewView, BookingView)
+
 from restaurant.views.user_action_views import (RestaurantRecommendationsView, ApproveBookingView, ManageBookingsRestaurantView, RestaurantsListView, BookingsView, OtherFavoritesView, MakeFavoritesPublicView, MakeFavoritesPrivateView, RemoveFromFavoritesProfileView, AddToFavoritesView, RemoveFromFavoritesView, SignUpView, LogInView, ContactView, ProfileView, LogoutView, DeleteCommentFromProfileView, DeleteUserView, MakeUserOwnerView, OtherProfileView, FavoritesView)
-import restaurant
+
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('meal/', include('restaurant.urls.meal')),
-    path('restaurant/', include('restaurant.urls.restaurant')),
-    path('user/', include('restaurant.urls.user')),
-    path('home/', HomeView.as_view(), name='home'),
-    path('', SearchView.as_view(), name='search'),
-    path('restricted_home/<int:page_no>/', RestrictedHomeView.as_view(), name='restricted_home'),
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('signup/', SignUpView.as_view(), name='signup'),
+    path('login/', LogInView.as_view(), name='login'),
+    path('contact/', ContactView.as_view(), name='contact'),
+    path('profile/<int:id>/', ProfileView.as_view(), name='profile'),
+    path('other_profile/<int:id>/', OtherProfileView.as_view(), name='other_profile'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('delete_comment_from_profile/<int:comment_id>/', DeleteCommentFromProfileView.as_view(),
+         name='delete_comment_from_profile'),
+    path('delete_user/', DeleteUserView.as_view(), name='delete_user'),
+    path('make_user_an_owner/', MakeUserOwnerView.as_view(), name='make_user_owner'),
+    path('favorites/<int:id>/<int:page_no>/', FavoritesView.as_view(), name='favorites'),
+    path('remove_from_favorites_profile/<int:id>/<int:page_no>/', RemoveFromFavoritesProfileView.as_view(), name='remove_from_favorites_profile'),
+    path('make_public/', MakeFavoritesPublicView.as_view(), name='make_public'),
+    path('make_private/', MakeFavoritesPrivateView.as_view(), name='make_private'),
+    path('other_favorites/<int:id>/<int:page_no>/', OtherFavoritesView.as_view(), name='other_favorites'),
+   ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

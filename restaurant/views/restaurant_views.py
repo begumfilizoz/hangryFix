@@ -1,22 +1,18 @@
 # Create your views here.
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from django.core.serializers import serialize
-from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine, FavoritesList, \
-    ThirtyMinuteBookingSlot, TwoHourBookingSlot, Booking
-from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm, SearchRestaurantForm, \
-    BookingForm
-from django.contrib.auth import authenticate, logout, login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
-from django.db.models import Avg
-from django.http import JsonResponse
-from cities_light.models import City, Country
-from django.contrib import messages
-import folium
-from datetime import datetime, timedelta
 import math
+from datetime import datetime, timedelta
+
+import folium
+from cities_light.models import City
+from django.contrib import messages
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from .utils import create_booking_slots, process_slots
+from django.views import View
+
+from restaurant.forms import AddRestaurantForm, AddMealForm, AddCommentForm, BookingForm
+from restaurant.models import Restaurant, Food, Comment, Like, ThirtyMinuteBookingSlot, TwoHourBookingSlot, Booking
+from restaurant.utils import create_booking_slots, process_slots
 
 
 class AddRestaurantView(View):
@@ -46,7 +42,7 @@ class GetCitiesAndCountriesView(View):
 
 
 class RestaurantDetailView(View):
-    def get(self, request, id, pageno):
+    def get(self, request, id, page_no):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_exists = True
 
@@ -59,9 +55,9 @@ class RestaurantDetailView(View):
 
         # checks if there are more comments to be displayed in the next page and takes the first 5 comments based on
         # page no
-        if (pageno + 1) * 5 > comments.count():
+        if (page_no + 1) * 5 > comments.count():
             next_exists = False
-        comments = comments[pageno * 5:pageno * 5 + 5]
+        comments = comments[page_no * 5:page_no * 5 + 5]
 
         # finds the comments liked by that user for this restaurant
         liked_comments = []
@@ -85,10 +81,10 @@ class RestaurantDetailView(View):
         return render(request, 'restaurantdetail.html',
                       {'comments': comments, 'map_html': map_html, 'liked_comments': liked_comments,
                        'restaurant': restaurant, 'form': form,
-                       'rating': rating, 'next_exists': next_exists, 'pageno': pageno,
+                       'rating': rating, 'next_exists': next_exists, 'page_no': page_no,
                        'restaurant_in_favorites': restaurant_in_favorites})
 
-    def post(self, request, id, pageno):
+    def post(self, request, id, page_no):
         restaurant = get_object_or_404(Restaurant, id=id)
         next_exists = True
 
@@ -99,9 +95,9 @@ class RestaurantDetailView(View):
 
         # checks if there are more comments to be displayed in the next page and takes the first 5 comments based on
         # page no
-        if (pageno + 1) * 5 > comments.count():
+        if (page_no + 1) * 5 > comments.count():
             next_exists = False
-        comments = comments[pageno * 5:pageno * 5 + 5]
+        comments = comments[page_no * 5:page_no * 5 + 5]
 
         # finds the comments liked by that user for this restaurant
         liked_comments = []
@@ -132,17 +128,17 @@ class RestaurantDetailView(View):
             rating = restaurant.find_rating()
             restaurant.point = rating
             restaurant.save()
-            return redirect('restaurantdetail', id=restaurant.id, pageno=pageno)
+            return redirect('restaurant_detail', id=restaurant.id, page_no=page_no)
 
         return render(request, 'restaurantdetail.html',
                       {'comments': comments, 'map_html': map_html, 'liked_comments': liked_comments,
                        'restaurant': restaurant, 'form': form,
-                       'rating': rating, 'next_exists': next_exists, 'pageno': pageno,
+                       'rating': rating, 'next_exists': next_exists, 'page_no': page_no,
                        'restaurant_in_favorites': restaurant_in_favorites})
 
 
 class LikeUnlikeReviewView(View):
-    def post(self, request, id, pageno):
+    def post(self, request, id, page_no):
         comment = get_object_or_404(Comment, id=id)
         restaurant = get_object_or_404(Restaurant, id=comment.restaurant.id)
         user = request.user
@@ -165,7 +161,7 @@ class LikeUnlikeReviewView(View):
                 'message': message,
                 'liked': liked,
                 'restaurant_id': restaurant.id,
-                'pageno': pageno
+                'page_no': page_no
             }
             return JsonResponse(response_data)
         else:
@@ -183,10 +179,10 @@ class MenuView(View):
 
 
 class DeleteCommentFromRestView(View):
-    def post(self, request, restId, commentId):
-        comment = get_object_or_404(Comment, id=commentId)
+    def post(self, request, rest_id, comment_id):
+        comment = get_object_or_404(Comment, id=comment_id)
         comment.delete()
-        return redirect('restaurantdetail', id=restId, pageno=0)
+        return redirect('restaurant_detail', id=rest_id, page_no=0)
 
 
 class AddMealView(View):
@@ -214,17 +210,17 @@ class RemoveMealsView(View):
 
 
 class RemoveMealView(View):
-    def post(self, request, foodId, resId):
-        food = get_object_or_404(Food, id=foodId)
+    def post(self, request, food_id, res_id):
+        food = get_object_or_404(Food, id=food_id)
         food.delete()
-        return redirect('removemeals', id=resId)
+        return redirect('remove_meals', id=res_id)
 
 
 class RemoveRestaurantView(View):
-    def post(self, request, resId, userId):
-        restaurant = get_object_or_404(Restaurant, id=resId)
+    def post(self, request, res_id, user_id):
+        restaurant = get_object_or_404(Restaurant, id=res_id)
         restaurant.delete()
-        return redirect('profile', id=userId)
+        return redirect('profile', id=user_id)
 
 
 class BookingView(View):
@@ -293,7 +289,7 @@ class PickSlotView(View):
 
         messages.success(request,
                          "Booking request completed successfully. Check your profile for updates on your request.")
-        return redirect('restaurantdetail', id=restaurant.id, pageno=0)
+        return redirect('restaurant_detail', id=restaurant.id, page_no=0)
 
 
 class BookNextDay(View):  # same as BookingView, however this shows the next day
@@ -352,7 +348,9 @@ class DeleteBookingView(View):
         return render(request, 'userbookings.html', {'count': count, 'bookings': bookings})
 
 
-class DeleteBookingOwnerView(View): # same as DeleteBookingView, but for the owner to cancel bookings
+class DeleteBookingOwnerView(View):
+
+    # same as DeleteBookingView, but for the owner to cancel bookings
     def post(self, request, id):
         booking = get_object_or_404(Booking, id=id)
         restaurant = booking.restaurant

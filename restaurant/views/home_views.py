@@ -1,21 +1,16 @@
 # Create your views here.
+from urllib.parse import urlencode
+
+from cities_light.models import City, Country
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.core.serializers import serialize
-from .models import Restaurant, Food, User, Comment, ContactMessage, Like, Cuisine
-from .forms import UserCreationForm, AddRestaurantForm, AddMealForm, AddCommentForm, ContactForm, SearchRestaurantForm
-from django.contrib.auth import authenticate, logout, login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
-from django.db.models import Avg
-from django.http import JsonResponse
-from cities_light.models import City, Country
-from django.contrib import messages
-import folium
-from urllib.parse import urlencode
+
+from restaurant.forms import SearchRestaurantForm
+from restaurant.models import Restaurant, Cuisine
 
 
 class RestrictedHomeView(View):
-    def get(self, request, pageno):
+    def get(self, request, page_no):
         next_exists = True
         filters = {}
         name = request.GET.get('name')
@@ -31,14 +26,14 @@ class RestrictedHomeView(View):
         restaurants = Restaurant.objects.filter(**filters)
         if name:
             restaurants = restaurants.filter(name__icontains=name)
-        if pageno != -1:
-            if (pageno + 1) * 5 > restaurants.count():
+        if page_no != -1:
+            if (page_no + 1) * 5 > restaurants.count():
                 next_exists = False
             restaurants.order_by('id')
-            restaurants = restaurants[pageno * 5:pageno * 5 + 5]
+            restaurants = restaurants[page_no * 5:page_no * 5 + 5]
         context = {
             'restaurants': restaurants,
-            'pageno': pageno,
+            'page_no': page_no,
             'next_exists': next_exists
         }
         return render(request, 'home.html', context)
@@ -78,7 +73,7 @@ class SearchView(View):
                 query_string = "all=1"  # Default if no parameters are selected
 
             # Redirect to the URL with query parameters
-            return redirect(f'/restrictedhome/0/?{query_string}')
+            return redirect(f'/restricted_home/0/?{query_string}')
 
         return render(request, 'searchrestaurant.html', context={'form': form})
 

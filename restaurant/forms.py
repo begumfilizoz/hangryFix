@@ -40,7 +40,7 @@ class AddRestaurantForm(forms.ModelForm):
 
     class Meta:
         model = Restaurant
-        fields = ['name', 'country', 'city', 'cuisine', 'image', 'lat', 'lng', 'start_time', 'end_time']
+        fields = ['name', 'country', 'city', 'cuisine', 'image', 'lat', 'lng', 'start_time', 'end_time', 'tables']
         widgets = {
             'start_time': TimeInput(format='%H:%M'),
             'end_time': TimeInput(format='%H:%M'),
@@ -62,8 +62,8 @@ class AddMealForm(forms.ModelForm):
 
 class AddCommentForm(forms.ModelForm):
     rating = forms.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
-        help_text="Enter a rating between 0.0 and 5.0"
+        validators=[MinValueValidator(1.0), MaxValueValidator(5.0)],
+        help_text="Enter a rating between 1.0 and 5.0"
     )
 
     class Meta:

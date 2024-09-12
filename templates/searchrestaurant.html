@@ -30,7 +30,7 @@
         $('#id_country').on('change', function () {
             const countryId = $(this).val();
             $.ajax({
-                url: '{% url "getcitiesandcountries" %}',
+                url: '{% url "get_cities_and_countries" %}',
                 type: "GET",
                 data: {
                     'country_id': countryId

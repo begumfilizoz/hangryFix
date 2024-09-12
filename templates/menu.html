@@ -4,7 +4,7 @@
 
 {% block content %}
     <h1>{{ restaurant.name }}</h1>
-    <a href="{% url 'restaurantdetail' restaurant.id 0 %}">
+    <a href="{% url 'restaurant_detail' restaurant.id 0 %}">
         <button class="back-to-restaurant" style="background-color: #f0d067; border-radius: 20px; border-color: black; font-weight: bold; cursor: pointer; transition: background-color 0.3s ease;" 
                         onmouseover="this.style.backgroundColor='brown';" 
                         onmouseout="this.style.backgroundColor='#f0d067';">

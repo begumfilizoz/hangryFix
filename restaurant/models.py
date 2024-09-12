@@ -120,3 +120,8 @@ class TwoHourBookingSlot(models.Model):
     start_time = models.TimeField(default=datetime.time(9, 0))
     end_time = models.TimeField(default=datetime.time(11, 0))
     date = models.DateField(default=now)
+
+
+class RestaurantRecommendations(models.Model):
+    restaurant_id = models.IntegerField()
+    user_id = models.IntegerField()
