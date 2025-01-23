@@ -96,7 +96,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hangryFix',
         'USER': 'postgres',
-        'PASSWORD': 'Cru6*&pu',
+        'PASSWORD': 'password-goes-here',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
