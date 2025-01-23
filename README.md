@@ -35,7 +35,7 @@ pip install -r requirements.txt
 CREATE DATABASE hangryfix;
 GRANT ALL PRIVILEGES ON DATABASE hangryfix TO <your-postgres-user>;
 
-# Replace <your-postgres-user> with your PostgreSQL username (e.g., postgres).
+# Replace <your-postgres-user> with your PostgreSQL username (e.g., postgres in my case).
 
 # 5. Apply Database Migrations
 python manage.py makemigrations
