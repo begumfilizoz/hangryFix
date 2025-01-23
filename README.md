@@ -36,6 +36,17 @@ CREATE DATABASE hangryfix;
 GRANT ALL PRIVILEGES ON DATABASE hangryfix TO <your-postgres-user>;
 
 # Replace <your-postgres-user> with your PostgreSQL username (e.g., postgres in my case).
+# Edit settings.py inside the internshipProject folder as needed with your postgresql username and password
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hangryFix',
+        'USER': 'your-username',
+        'PASSWORD': 'your-password',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
 
 # 5. Apply Database Migrations
 python manage.py makemigrations
