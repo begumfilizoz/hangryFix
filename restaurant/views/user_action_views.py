@@ -17,6 +17,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics.pairwise import cosine_similarity
 from geopy.distance import geodesic
 import numpy as np
+from restaurant.management.commands.recommendations import Command as RecommendRestaurantsCommand
 import pandas as pd
 from restaurant.utils import show_favorites
 
@@ -230,17 +231,19 @@ class ApproveBookingView(View):
 class RestaurantRecommendationsView(View):
     def get(self, request):
         user = request.user
-        # fetch the high reviews of the logged in user
-        high_reviews = Comment.objects.filter(user=user, rating__gte=4).select_related('restaurant')
 
-        # bool to alert the template if there are no reviews to use
-        reviews_exist = True
-        if not high_reviews.exists():
-            reviews_exist = False
+        # Call the management command directly
+        command = RecommendRestaurantsCommand()
+        command.handle()  # Executes the recommendation logic for all users
 
-        # get the recommended restaurants from the database
+        # Fetch recommendations for the logged-in user
         recommendations = RestaurantRecommendations.objects.filter(user_id=user.id)
-        recommended_restaurants = []
-        for recommendation in recommendations:
-            recommended_restaurants.append(Restaurant.objects.get(id=recommendation.restaurant_id))
-        return render(request, 'restaurantrecommendations.html', {'reviews_exist': reviews_exist, 'recommended_restaurants': recommended_restaurants})
+        recommended_restaurants = [Restaurant.objects.get(id=r.restaurant_id) for r in recommendations]
+
+        # Check if the user has high reviews to generate recommendations
+        reviews_exist = Comment.objects.filter(user=user, rating__gte=4).exists()
+
+        return render(request, 'restaurantrecommendations.html', {
+            'reviews_exist': reviews_exist,
+            'recommended_restaurants': recommended_restaurants,
+        })

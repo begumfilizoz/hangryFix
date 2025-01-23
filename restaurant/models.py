@@ -15,7 +15,7 @@ class FavoritesList(models.Model):
 
 class User(AbstractUser):
     isOwner = models.BooleanField(default=False)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=500)
     favorites = models.OneToOneField(FavoritesList, on_delete=models.SET_NULL, null=True, blank=True)
     favorites_is_private = models.BooleanField(default=False)
     # location = models.CharField(max_length=100, blank=True, null=True)
@@ -25,7 +25,7 @@ class User(AbstractUser):
 
 
 class Cuisine(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=500)
 
     def __str__(self):
         return self.name
@@ -33,7 +33,7 @@ class Cuisine(models.Model):
 
 class Restaurant(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    name = models.CharField(max_length=100, blank=True)
+    name = models.CharField(max_length=500, blank=True)
     cuisine = models.ForeignKey(Cuisine, on_delete=models.CASCADE, null=True, blank=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True, blank=True)
@@ -51,15 +51,16 @@ class Restaurant(models.Model):
         return self.name
 
     def find_rating(self):
+        # find the average of all the ratings given for this restaurant to display it
         point = self.comment_set.aggregate(Avg('rating'))['rating__avg']
         return point if point is not None else 0.0
 
 
 class Food(models.Model):
     restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=500)
     price = models.FloatField()
-    description = models.CharField(max_length=300)
+    description = models.CharField(max_length=500)
     image = models.ImageField(upload_to='food-images/', default='images/food.jpg')
 
     def __str__(self):
@@ -86,7 +87,7 @@ class Like(models.Model):
 
 
 class ContactMessage(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=500)
     email = models.EmailField()
     message = models.TextField()
 

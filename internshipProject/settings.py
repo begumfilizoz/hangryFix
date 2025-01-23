@@ -94,7 +94,7 @@ WSGI_APPLICATION = 'internshipProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'hangryfix',
+        'NAME': 'begumoz',
         'USER': 'postgres',
         'PASSWORD': 'Cru6*&pu',
         'HOST': '127.0.0.1',
