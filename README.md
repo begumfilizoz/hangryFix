@@ -8,6 +8,7 @@ The project originally had a large local database, in which Django's cities_ligh
 ## **Features**
 - User authentication with support for owners and customers.
 - Restaurant and cuisine management.
+- Restaurant recommendation system for users based on their reviews.
 - Booking system with multiple booking slot options.
 - Ratings and comments for restaurants.
 - Integration with [cities_light](https://github.com/yourlabs/django-cities-light) for cities and countries. (This is not valid at the moment for simplification, it is implemented but the app uses mockdata)
